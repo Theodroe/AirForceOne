@@ -34,14 +34,29 @@ CSV_PATH = _os.path.join(_PROJECT_ROOT, "data", "날씨", "체감온도(2020~202
 ALL_YEARS = [2020, 2021, 2022, 2023, 2024, 2025]
 ALL_MONTHS = list(range(1, 13))
 
+
+def _read_csv_with_fallback(path: str, **kwargs) -> pd.DataFrame:
+    last_error = None
+    for enc in ("utf-8", "utf-8-sig", "cp949"):
+        try:
+            return pd.read_csv(path, encoding=enc, **kwargs)
+        except UnicodeDecodeError as e:
+            last_error = e
+            continue
+        except TypeError:
+            return pd.read_csv(path, **kwargs)
+    if last_error is not None:
+        raise last_error
+    return pd.read_csv(path, **kwargs)
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # 2. 데이터 로드 / 전처리 (캐싱)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @st.cache_data(show_spinner="📂 데이터 로드 중…")
 def load_data(path: str = CSV_PATH) -> pd.DataFrame:
-    df = pd.read_csv(
-        path, encoding="cp949",
+    df = _read_csv_with_fallback(
+        path,
         usecols=["year", "month", "day", "hour", "region", "sploc",
                  "ta", "ws", "hm", "WCT", "rn", "dsnw"],
     )
