@@ -14,12 +14,12 @@ def render_streamlit_base_style() -> None:
         --wb-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
         --wb-shadow-hover: 0 18px 40px rgba(15, 23, 42, 0.14);
         --wb-text-muted: color-mix(in srgb, var(--text-color) 72%, transparent);
-        --wb-accent-soft: color-mix(in srgb, var(--primary-color) 12%, var(--secondary-background-color));
-        --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 7%, var(--background-color));
-        --wb-accent-border: color-mix(in srgb, var(--primary-color) 28%, transparent);
+        --wb-accent-soft: color-mix(in srgb, var(--primary-color) 18%, var(--secondary-background-color));
+        --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 10%, var(--background-color));
+        --wb-accent-border: color-mix(in srgb, var(--primary-color) 38%, transparent);
         --wb-card-highlight: linear-gradient(
             180deg,
-            color-mix(in srgb, var(--primary-color) 5%, var(--secondary-background-color)) 0%,
+            color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color)) 0%,
             var(--secondary-background-color) 100%
         );
     }
@@ -31,12 +31,12 @@ def render_streamlit_base_style() -> None:
             --wb-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
             --wb-shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.42);
             --wb-text-muted: color-mix(in srgb, var(--text-color) 74%, transparent);
-            --wb-accent-soft: color-mix(in srgb, var(--primary-color) 16%, var(--secondary-background-color));
-            --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 10%, var(--background-color));
-            --wb-accent-border: color-mix(in srgb, var(--primary-color) 34%, transparent);
+            --wb-accent-soft: color-mix(in srgb, var(--primary-color) 22%, var(--secondary-background-color));
+            --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 14%, var(--background-color));
+            --wb-accent-border: color-mix(in srgb, var(--primary-color) 42%, transparent);
             --wb-card-highlight: linear-gradient(
                 180deg,
-                color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color)) 0%,
+                color-mix(in srgb, var(--primary-color) 12%, var(--secondary-background-color)) 0%,
                 var(--secondary-background-color) 100%
             );
         }
@@ -64,6 +64,23 @@ def render_streamlit_base_style() -> None:
 
     section[data-testid="stSidebar"] * {
         color: var(--text-color);
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a {
+        border-radius: 14px;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover {
+        background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] {
+        background: linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--primary-color) 18%, var(--secondary-background-color)),
+            color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color))
+        );
+        border: 1px solid var(--wb-accent-border);
     }
 
     .block-container {
@@ -110,6 +127,11 @@ def render_streamlit_base_style() -> None:
         margin-bottom: 1.05rem;
         position: relative;
         overflow: hidden;
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--primary-color) 10%, var(--secondary-background-color)),
+            var(--secondary-background-color)
+        );
     }
 
     .hero-card::after {
@@ -174,7 +196,11 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-hero-chip {
-        background: var(--wb-accent-soft);
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--primary-color) 22%, var(--secondary-background-color)),
+            color-mix(in srgb, var(--primary-color) 12%, var(--secondary-background-color))
+        );
         border: 1px solid var(--wb-accent-border);
         color: var(--text-color);
         border-radius: 999px;
@@ -192,6 +218,11 @@ def render_streamlit_base_style() -> None:
         gap: .22rem;
         position: relative;
         overflow: hidden;
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color)) 0%,
+            var(--secondary-background-color) 78%
+        );
     }
 
     .wb-stat-card::before {
@@ -227,6 +258,11 @@ def render_streamlit_base_style() -> None:
         min-height: 220px;
         position: relative;
         overflow: hidden;
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--primary-color) 5%, var(--secondary-background-color)) 0%,
+            var(--secondary-background-color) 100%
+        );
     }
 
     .wb-module-card-strong {
@@ -251,12 +287,14 @@ def render_streamlit_base_style() -> None:
     .wb-module-variant-success .wb-module-icon {
         background: linear-gradient(
             180deg,
-            var(--wb-accent-soft),
-            var(--wb-accent-soft-2)
+            color-mix(in srgb, var(--primary-color) 28%, var(--secondary-background-color)),
+            color-mix(in srgb, var(--primary-color) 14%, var(--background-color))
         );
         border: 1px solid var(--wb-accent-border);
         color: var(--text-color);
-        box-shadow: inset 0 1px 0 color-mix(in srgb, white 24%, transparent);
+        box-shadow:
+            inset 0 1px 0 color-mix(in srgb, white 24%, transparent),
+            0 8px 18px color-mix(in srgb, var(--primary-color) 12%, transparent);
     }
 
     .wb-module-head {
@@ -291,6 +329,11 @@ def render_streamlit_base_style() -> None:
         min-height: 132px;
         position: relative;
         overflow: hidden;
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--primary-color) 7%, var(--secondary-background-color)) 0%,
+            var(--secondary-background-color) 82%
+        );
     }
 
     .wb-brief-card::before {
@@ -408,9 +451,13 @@ def render_streamlit_base_style() -> None:
     .stFormSubmitButton > button:hover {
         border-color: var(--wb-accent-border) !important;
         color: var(--text-color) !important;
-        background: var(--wb-accent-soft) !important;
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--primary-color) 20%, var(--secondary-background-color)),
+            color-mix(in srgb, var(--primary-color) 10%, var(--secondary-background-color))
+        ) !important;
         transform: translateY(-1px);
-        box-shadow: 0 10px 22px color-mix(in srgb, black 10%, transparent) !important;
+        box-shadow: 0 10px 22px color-mix(in srgb, var(--primary-color) 12%, transparent) !important;
     }
 
     .stTextInput input,
