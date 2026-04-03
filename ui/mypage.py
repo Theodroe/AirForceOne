@@ -25,10 +25,15 @@ RANK_OPTIONS = [
 
 def _info_card(label: str, value: object, variant: str) -> None:
     safe_value = value if value not in (None, "") else "-"
-    st.markdown(f'<div class="wb-info-box {variant}">', unsafe_allow_html=True)
-    st.markdown(f'<div class="wb-info-kicker">{label}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="wb-info-main">{safe_value}</div>', unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(
+        f'''
+        <div class="wb-info-box {variant}">
+            <div class="wb-info-kicker">{label}</div>
+            <div class="wb-info-main">{safe_value}</div>
+        </div>
+        ''',
+        unsafe_allow_html=True,
+    )
 
 
 def _section_header(title: str, subtitle: str | None = None) -> None:
@@ -76,22 +81,22 @@ def render_mypage_dashboard() -> None:
         _section_header("기본 정보", "운용자 프로필과 권한 정보를 한눈에 확인합니다.")
         st.markdown('<div class="wb-panel wb-info-panel">', unsafe_allow_html=True)
 
-        r1c1, r1c2 = st.columns(2, gap="medium")
-        with r1c1:
+        row1_col1, row1_col2 = st.columns(2, gap="medium")
+        with row1_col1:
             _info_card("이름", user.get("username"), "blue")
-        with r1c2:
+        with row1_col2:
             _info_card("군번", user.get("service_number"), "purple")
 
-        r2c1, r2c2 = st.columns(2, gap="medium")
-        with r2c1:
+        row2_col1, row2_col2 = st.columns(2, gap="medium")
+        with row2_col1:
             _info_card("부대", user.get("unit_id"), "cyan")
-        with r2c2:
+        with row2_col2:
             _info_card("권한", user.get("role"), "amber")
 
-        r3c1, r3c2 = st.columns(2, gap="medium")
-        with r3c1:
+        row3_col1, row3_col2 = st.columns(2, gap="medium")
+        with row3_col1:
             _info_card("계급", user.get("military_rank") or "미설정", "green")
-        with r3c2:
+        with row3_col2:
             st.markdown(
                 '''
                 <div class="wb-info-box wb-info-summary">
@@ -103,7 +108,7 @@ def render_mypage_dashboard() -> None:
                 unsafe_allow_html=True,
             )
 
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with right:
         _section_header("빠른 설정", "마이페이지에서 자주 쓰는 작업")
@@ -128,7 +133,10 @@ def render_mypage_dashboard() -> None:
         st.markdown('<div class="wb-divider"></div>', unsafe_allow_html=True)
 
         with st.expander("계정 관리", expanded=False):
-            st.markdown('<div class="wb-danger-note">탈퇴는 마이페이지에서만 가능합니다. 처리 후 즉시 로그아웃됩니다.</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="wb-danger-note">탈퇴는 마이페이지에서만 가능합니다. 처리 후 즉시 로그아웃됩니다.</div>',
+                unsafe_allow_html=True,
+            )
             with st.form("delete_account_form", clear_on_submit=True):
                 delete_pw = st.text_input("탈퇴 확인용 비밀번호", type="password")
                 delete_submit = st.form_submit_button("탈퇴하기", use_container_width=True)
@@ -145,17 +153,17 @@ def render_mypage_dashboard() -> None:
             ok, msg = change_password(user["service_number"], cur, new)
             (st.success if ok else st.error)(msg)
 
-        if 'delete_submit' in locals() and delete_submit:
+        if "delete_submit" in locals() and delete_submit:
             ok, msg = delete_user(user["service_number"], delete_pw)
             (st.success if ok else st.error)(msg)
             if ok:
                 st.switch_page("app.py")
 
+    _section_header("기록 조회", "접속 및 감사 로그를 탭별로 확인합니다.")
     labels = ["내 접속 기록", "내 감사 로그"]
     if user.get("role") in {"admin", "officer"}:
         labels += ["전체 접속 로그", "전체 감사 로그"]
 
-    _section_header("기록 조회", "접속 및 감사 로그를 탭별로 확인합니다.")
     tabs = st.tabs(labels)
     with tabs[0]:
         render_access_logs_table(pd.DataFrame(get_my_access_logs()))
