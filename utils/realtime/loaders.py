@@ -78,7 +78,7 @@ def cell(
     """온도값 + 특보 오버라이드 → '13.3 🟢 가능' 형태 문자열."""
     base, _ = get_status(val, month)
     final   = apply_alert_to_status(base, alert_level)
-    return f"{val:.1f}  {STATUS_EMOJI[final]} {final}"
+    return f"{val:.1f}  {STATUS_EMOJI[final]}"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
