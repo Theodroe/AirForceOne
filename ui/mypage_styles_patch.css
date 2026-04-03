@@ -1,0 +1,49 @@
+/* mypage safe cards without raw html grid rendering */
+.wb-info-panel,
+.wb-action-panel {
+    padding: 1.05rem 1.1rem;
+}
+
+.wb-info-box {
+    border-radius: 18px;
+    border: 1px solid var(--wb-border);
+    padding: .95rem 1rem .75rem 1rem;
+    min-height: 120px;
+    margin-bottom: .8rem;
+    box-shadow: none;
+}
+
+.wb-info-box.blue {
+    background: linear-gradient(135deg, var(--wb-blue), var(--secondary-background-color) 72%);
+    border-color: var(--wb-blue-border);
+}
+.wb-info-box.purple {
+    background: linear-gradient(135deg, var(--wb-purple), var(--secondary-background-color) 72%);
+    border-color: var(--wb-purple-border);
+}
+.wb-info-box.cyan {
+    background: linear-gradient(135deg, var(--wb-cyan), var(--secondary-background-color) 72%);
+    border-color: var(--wb-cyan-border);
+}
+.wb-info-box.amber {
+    background: linear-gradient(135deg, var(--wb-amber), var(--secondary-background-color) 72%);
+    border-color: var(--wb-amber-border);
+}
+.wb-info-box.green {
+    background: linear-gradient(135deg, var(--wb-green), var(--secondary-background-color) 72%);
+    border-color: var(--wb-green-border);
+}
+
+.wb-info-box [data-testid="stCaptionContainer"] {
+    margin-bottom: .25rem;
+}
+
+.wb-info-box h3 {
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .wb-info-box {
+        min-height: auto;
+    }
+}

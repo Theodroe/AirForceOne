@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import html
-
 import pandas as pd
 import streamlit as st
 
@@ -25,17 +23,12 @@ RANK_OPTIONS = [
 ]
 
 
-def _safe(value: object) -> str:
-    return html.escape(str(value if value not in (None, "") else "-"))
-
-
-def _info_item(label: str, value: object) -> str:
-    return f"""
-    <div class="wb-info-item">
-        <div class="wb-info-label">{html.escape(label)}</div>
-        <div class="wb-info-value">{_safe(value)}</div>
-    </div>
-    """
+def _render_info_card(label: str, value: object, variant: str = "blue") -> None:
+    safe_value = value if value not in (None, "") else "-"
+    st.markdown(f'<div class="wb-info-box {variant}">', unsafe_allow_html=True)
+    st.caption(label)
+    st.markdown(f"### {safe_value}")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_mypage_dashboard() -> None:
@@ -48,13 +41,13 @@ def render_mypage_dashboard() -> None:
             user = st.session_state["user"]
 
     st.markdown(
-        """
+        '''
         <div class="hero-card">
             <div class="page-eyebrow">OPERATOR PROFILE</div>
             <div class="page-title" style="font-size:1.9rem;">마이페이지</div>
             <div class="page-subtitle">기본 정보, 계급, 비밀번호, 접속 로그를 한 곳에서 관리합니다.</div>
         </div>
-        """,
+        ''',
         unsafe_allow_html=True,
     )
 
@@ -62,35 +55,42 @@ def render_mypage_dashboard() -> None:
         st.info("로그인이 필요합니다.")
         return
 
-    left, right = st.columns([1.2, 0.8], gap="large")
+    left, right = st.columns([1.25, 0.75], gap="large")
 
     with left:
         st.markdown('<div class="section-title">기본 정보</div>', unsafe_allow_html=True)
-        info_html = "".join(
-            [
-                _info_item("이름", user.get("username")),
-                _info_item("군번", user.get("service_number")),
-                _info_item("부대", user.get("unit_id")),
-                _info_item("권한", user.get("role")),
-                _info_item("계급", user.get("military_rank") or "미설정"),
-            ]
-        )
-        st.markdown(
-            f'<div class="wb-panel wb-info-panel"><div class="wb-info-grid">{info_html}</div></div>',
-            unsafe_allow_html=True,
-        )
+        st.markdown('<div class="wb-panel wb-info-panel">', unsafe_allow_html=True)
+
+        r1c1, r1c2 = st.columns(2, gap="medium")
+        with r1c1:
+            _render_info_card("이름", user.get("username"), "blue")
+        with r1c2:
+            _render_info_card("군번", user.get("service_number"), "purple")
+
+        r2c1, r2c2 = st.columns(2, gap="medium")
+        with r2c1:
+            _render_info_card("부대", user.get("unit_id"), "cyan")
+        with r2c2:
+            _render_info_card("권한", user.get("role"), "amber")
+
+        r3c1, r3c2 = st.columns(2, gap="medium")
+        with r3c1:
+            _render_info_card("계급", user.get("military_rank") or "미설정", "green")
+        with r3c2:
+            st.empty()
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with right:
         st.markdown('<div class="section-title">계급 변경</div>', unsafe_allow_html=True)
         current_rank = user.get("military_rank") or "미설정"
         idx = RANK_OPTIONS.index(current_rank) if current_rank in RANK_OPTIONS else 0
 
-        with st.container():
-            st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
-            with st.form("rank_update_form", clear_on_submit=False):
-                new_rank = st.selectbox("계급", RANK_OPTIONS, index=idx)
-                rank_submit = st.form_submit_button("계급 저장", use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
+        with st.form("rank_update_form", clear_on_submit=False):
+            new_rank = st.selectbox("계급", RANK_OPTIONS, index=idx)
+            rank_submit = st.form_submit_button("계급 저장", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
         if rank_submit:
             ok, msg = update_rank(user["service_number"], None if new_rank == "미설정" else new_rank)
@@ -99,29 +99,27 @@ def render_mypage_dashboard() -> None:
                 st.switch_page("pages/my_page.py")
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">비밀번호 변경</div>', unsafe_allow_html=True)
-    with st.container():
-        st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
-        with st.form("change_password_form", clear_on_submit=True):
-            p1, p2 = st.columns(2, gap="large")
-            with p1:
-                cur = st.text_input("현재 비밀번호", type="password")
-            with p2:
-                new = st.text_input("새 비밀번호", type="password")
-            pw_submit = st.form_submit_button("비밀번호 변경", use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
+    with st.form("change_password_form", clear_on_submit=True):
+        p1, p2 = st.columns(2, gap="large")
+        with p1:
+            cur = st.text_input("현재 비밀번호", type="password")
+        with p2:
+            new = st.text_input("새 비밀번호", type="password")
+        pw_submit = st.form_submit_button("비밀번호 변경", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     if pw_submit:
         ok, msg = change_password(user["service_number"], cur, new)
         (st.success if ok else st.error)(msg)
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">계정 관리</div>', unsafe_allow_html=True)
     with st.expander("탈퇴하기", expanded=False):
-        with st.container():
-            st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
-            with st.form("delete_account_form", clear_on_submit=True):
-                st.caption("탈퇴는 마이페이지에서만 가능합니다. 처리 후 즉시 로그아웃됩니다.")
-                delete_pw = st.text_input("탈퇴 확인용 비밀번호", type="password")
-                delete_submit = st.form_submit_button("탈퇴하기", use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
+        with st.form("delete_account_form", clear_on_submit=True):
+            st.caption("탈퇴는 마이페이지에서만 가능합니다. 처리 후 즉시 로그아웃됩니다.")
+            delete_pw = st.text_input("탈퇴 확인용 비밀번호", type="password")
+            delete_submit = st.form_submit_button("탈퇴하기", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         if delete_submit:
             ok, msg = delete_user(user["service_number"], delete_pw)
             (st.success if ok else st.error)(msg)
