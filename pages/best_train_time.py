@@ -167,9 +167,8 @@ with region_col:
 
 @st.fragment(run_every=1)
 def live_clock():
-        st.caption("현재 시각")
+    st.caption("현재 시각")
     st.write(f"#### {fmt_hms()}")
-
 
 with clock_col:
     with st.container():
