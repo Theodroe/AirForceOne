@@ -8,7 +8,7 @@ def render_streamlit_base_style() -> None:
     <style>
     :root {
         --wb-border: rgba(120, 130, 150, 0.18);
-        --wb-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+        --wb-shadow: 0 9px 20px rgba(15, 23, 42, 0.07);
 
         --wb-blue: #dbeafe;
         --wb-cyan: #cffafe;
@@ -28,7 +28,7 @@ def render_streamlit_base_style() -> None:
     @media (prefers-color-scheme: dark) {
         :root {
             --wb-border: rgba(255, 255, 255, 0.12);
-            --wb-shadow: 0 16px 34px rgba(0, 0, 0, 0.34);
+            --wb-shadow: 0 11px 22px rgba(0, 0, 0, 0.24);
 
             --wb-blue: rgba(59, 130, 246, 0.20);
             --wb-cyan: rgba(34, 211, 238, 0.18);
@@ -90,7 +90,7 @@ def render_streamlit_base_style() -> None:
     .wb-stat-card,
     .wb-operator-box,
     .card-soft {
-        border: 1px solid var(--wb-border);
+        border: 1px solid color-mix(in srgb, var(--wb-border) 78%, transparent);
         border-radius: 22px;
         box-shadow: var(--wb-shadow);
         overflow: hidden;
