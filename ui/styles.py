@@ -14,9 +14,9 @@ def render_streamlit_base_style() -> None:
         --wb-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
         --wb-shadow-hover: 0 18px 40px rgba(15, 23, 42, 0.14);
         --wb-text-muted: color-mix(in srgb, var(--text-color) 72%, transparent);
-        --wb-accent-soft: color-mix(in srgb, var(--primary-color) 18%, var(--secondary-background-color));
-        --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 10%, var(--background-color));
-        --wb-accent-border: color-mix(in srgb, var(--primary-color) 38%, transparent);
+        --wb-accent-soft: color-mix(in srgb, var(--primary-color) 26%, var(--secondary-background-color));
+        --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 16%, var(--background-color));
+        --wb-accent-border: color-mix(in srgb, var(--primary-color) 50%, transparent);
         --wb-card-highlight: linear-gradient(
             180deg,
             color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color)) 0%,
@@ -31,9 +31,9 @@ def render_streamlit_base_style() -> None:
             --wb-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
             --wb-shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.42);
             --wb-text-muted: color-mix(in srgb, var(--text-color) 74%, transparent);
-            --wb-accent-soft: color-mix(in srgb, var(--primary-color) 22%, var(--secondary-background-color));
-            --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 14%, var(--background-color));
-            --wb-accent-border: color-mix(in srgb, var(--primary-color) 42%, transparent);
+            --wb-accent-soft: color-mix(in srgb, var(--primary-color) 30%, var(--secondary-background-color));
+            --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 18%, var(--background-color));
+            --wb-accent-border: color-mix(in srgb, var(--primary-color) 54%, transparent);
             --wb-card-highlight: linear-gradient(
                 180deg,
                 color-mix(in srgb, var(--primary-color) 12%, var(--secondary-background-color)) 0%,
@@ -77,10 +77,11 @@ def render_streamlit_base_style() -> None:
     section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] {
         background: linear-gradient(
             90deg,
-            color-mix(in srgb, var(--primary-color) 18%, var(--secondary-background-color)),
-            color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color))
+            color-mix(in srgb, var(--primary-color) 28%, var(--secondary-background-color)),
+            color-mix(in srgb, var(--primary-color) 12%, var(--secondary-background-color))
         );
         border: 1px solid var(--wb-accent-border);
+        box-shadow: inset 3px 0 0 var(--primary-color);
     }
 
     .block-container {
@@ -93,7 +94,7 @@ def render_streamlit_base_style() -> None:
 
     .wb-brand {
         font-size: 1.65rem;
-        font-weight: 800;
+        font-weight: 700;
         letter-spacing: -0.03em;
         margin-bottom: .2rem;
     }
@@ -160,7 +161,7 @@ def render_streamlit_base_style() -> None:
     .page-eyebrow {
         color: var(--primary-color);
         font-size: .84rem;
-        font-weight: 800;
+        font-weight: 700;
         letter-spacing: .08em;
         text-transform: uppercase;
         margin-bottom: .45rem;
@@ -169,7 +170,7 @@ def render_streamlit_base_style() -> None:
     .page-title {
         font-size: 2.15rem;
         line-height: 1.08;
-        font-weight: 800;
+        font-weight: 760;
         margin: 0 0 .35rem 0;
         color: var(--text-color);
     }
@@ -182,7 +183,7 @@ def render_streamlit_base_style() -> None:
 
     .section-title {
         font-size: 1.02rem;
-        font-weight: 800;
+        font-weight: 700;
         margin-bottom: .8rem;
         color: var(--text-color);
         letter-spacing: -0.01em;
@@ -238,9 +239,17 @@ def render_streamlit_base_style() -> None:
         opacity: .95;
     }
 
+    .wb-stat-card::after {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 1px;
+        background: color-mix(in srgb, var(--primary-color) 28%, transparent);
+    }
+
     .wb-stat-label {
         font-size: .9rem;
-        font-weight: 800;
+        font-weight: 700;
         color: var(--wb-text-muted);
         margin-bottom: .18rem;
         letter-spacing: -0.01em;
@@ -249,7 +258,7 @@ def render_streamlit_base_style() -> None:
     .wb-stat-value {
         font-size: 1.65rem;
         line-height: 1.1;
-        font-weight: 900;
+        font-weight: 700;
         color: var(--text-color);
         letter-spacing: -0.03em;
     }
@@ -274,13 +283,13 @@ def render_streamlit_base_style() -> None:
         position: absolute;
         inset: 0 auto auto 0;
         width: 100%;
-        height: 3px;
+        height: 4px;
         background: linear-gradient(
             90deg,
-            color-mix(in srgb, var(--primary-color) 50%, transparent),
-            transparent
+            color-mix(in srgb, var(--primary-color) 78%, transparent),
+            color-mix(in srgb, var(--primary-color) 18%, transparent)
         );
-        opacity: .85;
+        opacity: .95;
     }
 
     .wb-module-variant-primary .wb-module-icon,
@@ -350,14 +359,14 @@ def render_streamlit_base_style() -> None:
 
     .wb-brief-label {
         font-size: .9rem;
-        font-weight: 800;
+        font-weight: 700;
         color: var(--wb-text-muted);
         margin-bottom: .4rem;
     }
 
     .wb-brief-value {
         font-size: 1.95rem;
-        font-weight: 900;
+        font-weight: 700;
         line-height: 1;
         color: var(--text-color);
         margin-bottom: .48rem;
@@ -383,7 +392,7 @@ def render_streamlit_base_style() -> None:
         border-radius: 999px;
         padding: .45rem .8rem;
         font-size: .85rem;
-        font-weight: 800;
+        font-weight: 700;
     }
 
     .wb-operator-state {
@@ -393,7 +402,7 @@ def render_streamlit_base_style() -> None:
 
     .wb-operator-name {
         font-size: 2rem;
-        font-weight: 900;
+        font-weight: 700;
         margin-bottom: .35rem;
     }
 
@@ -453,11 +462,11 @@ def render_streamlit_base_style() -> None:
         color: var(--text-color) !important;
         background: linear-gradient(
             180deg,
-            color-mix(in srgb, var(--primary-color) 20%, var(--secondary-background-color)),
-            color-mix(in srgb, var(--primary-color) 10%, var(--secondary-background-color))
+            color-mix(in srgb, var(--primary-color) 28%, var(--secondary-background-color)),
+            color-mix(in srgb, var(--primary-color) 14%, var(--secondary-background-color))
         ) !important;
         transform: translateY(-1px);
-        box-shadow: 0 10px 22px color-mix(in srgb, var(--primary-color) 12%, transparent) !important;
+        box-shadow: 0 10px 22px color-mix(in srgb, var(--primary-color) 18%, transparent) !important;
     }
 
     .stTextInput input,
