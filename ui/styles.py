@@ -139,37 +139,24 @@ def render_streamlit_base_style() -> None:
         flex-direction: column;
         justify-content: center;
         gap: .2rem;
+        color: var(--text-color) !important;
+        -webkit-text-fill-color: var(--text-color) !important;
     }
 
     .wb-stat-label {
         font-size: .92rem;
         font-weight: 700;
-        color: var(--wb-text-muted) !important;
-        -webkit-text-fill-color: var(--wb-text-muted) !important;
         margin-bottom: .15rem;
+        color: inherit !important;
+        -webkit-text-fill-color: inherit !important;
     }
 
     .wb-stat-value {
         font-size: 1.45rem;
         line-height: 1.15;
         font-weight: 800;
-        color: var(--text-color) !important;
-        -webkit-text-fill-color: var(--text-color) !important;
-    }
-
-    .wb-stat-card,
-    .wb-stat-card * {
-        color: var(--text-color);
-    }
-
-    .wb-stat-label * {
-        color: var(--wb-text-muted) !important;
-        -webkit-text-fill-color: var(--wb-text-muted) !important;
-    }
-
-    .wb-stat-value * {
-        color: var(--text-color) !important;
-        -webkit-text-fill-color: var(--text-color) !important;
+        color: inherit !important;
+        -webkit-text-fill-color: inherit !important;
     }
 
     .wb-module-card {
