@@ -9,42 +9,48 @@ def render_streamlit_base_style() -> None:
     :root {
         --wb-radius: 20px;
         --wb-radius-sm: 14px;
-        --wb-border: color-mix(in srgb, var(--text-color) 14%, transparent);
-        --wb-border-strong: color-mix(in srgb, var(--text-color) 22%, transparent);
-        --wb-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
-        --wb-shadow-hover: 0 18px 40px rgba(15, 23, 42, 0.14);
-        --wb-text-muted: color-mix(in srgb, var(--text-color) 72%, transparent);
-        --wb-accent-soft: color-mix(in srgb, var(--primary-color) 16%, var(--secondary-background-color));
-        --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 10%, var(--background-color));
-        --wb-accent-alt: color-mix(in srgb, #7c3aed 14%, var(--secondary-background-color));
-        --wb-accent-alt-2: color-mix(in srgb, #06b6d4 12%, var(--secondary-background-color));
-        --wb-accent-border: color-mix(in srgb, var(--primary-color) 24%, transparent);
-        --wb-card-highlight: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 7%, var(--secondary-background-color)) 48%,
-            color-mix(in srgb, #06b6d4 6%, var(--secondary-background-color)) 100%
-        );
+        --wb-border: rgba(120, 130, 150, 0.18);
+        --wb-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+        --wb-text-muted: rgba(31, 41, 55, 0.72);
+
+        /* 눈에 보이는 색 */
+        --wb-blue: #dbeafe;
+        --wb-indigo: #e0e7ff;
+        --wb-purple: #f3e8ff;
+        --wb-cyan: #cffafe;
+        --wb-rose: #ffe4e6;
+        --wb-amber: #fef3c7;
+        --wb-green: #dcfce7;
+
+        --wb-blue-border: #93c5fd;
+        --wb-purple-border: #c4b5fd;
+        --wb-cyan-border: #67e8f9;
+        --wb-amber-border: #fcd34d;
+        --wb-green-border: #86efac;
+        --wb-rose-border: #fda4af;
     }
 
     @media (prefers-color-scheme: dark) {
         :root {
-            --wb-border: color-mix(in srgb, white 12%, transparent);
-            --wb-border-strong: color-mix(in srgb, white 18%, transparent);
-            --wb-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
-            --wb-shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.42);
-            --wb-text-muted: color-mix(in srgb, var(--text-color) 74%, transparent);
-            --wb-accent-soft: color-mix(in srgb, var(--primary-color) 18%, var(--secondary-background-color));
-            --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 12%, var(--background-color));
-            --wb-accent-alt: color-mix(in srgb, #a78bfa 16%, var(--secondary-background-color));
-            --wb-accent-alt-2: color-mix(in srgb, #22d3ee 14%, var(--secondary-background-color));
-            --wb-accent-border: color-mix(in srgb, var(--primary-color) 28%, transparent);
-            --wb-card-highlight: linear-gradient(
-                135deg,
-                color-mix(in srgb, var(--primary-color) 11%, var(--secondary-background-color)) 0%,
-                color-mix(in srgb, #a78bfa 8%, var(--secondary-background-color)) 48%,
-                color-mix(in srgb, #22d3ee 7%, var(--secondary-background-color)) 100%
-            );
+            --wb-border: rgba(255, 255, 255, 0.10);
+            --wb-shadow: 0 16px 34px rgba(0, 0, 0, 0.34);
+            --wb-text-muted: rgba(255, 255, 255, 0.76);
+
+            /* 다크모드용 보이는 색 */
+            --wb-blue: rgba(59, 130, 246, 0.22);
+            --wb-indigo: rgba(99, 102, 241, 0.22);
+            --wb-purple: rgba(168, 85, 247, 0.20);
+            --wb-cyan: rgba(34, 211, 238, 0.18);
+            --wb-rose: rgba(244, 63, 94, 0.18);
+            --wb-amber: rgba(245, 158, 11, 0.20);
+            --wb-green: rgba(34, 197, 94, 0.18);
+
+            --wb-blue-border: rgba(96, 165, 250, 0.40);
+            --wb-purple-border: rgba(196, 181, 253, 0.38);
+            --wb-cyan-border: rgba(103, 232, 249, 0.34);
+            --wb-amber-border: rgba(252, 211, 77, 0.36);
+            --wb-green-border: rgba(134, 239, 172, 0.34);
+            --wb-rose-border: rgba(253, 164, 175, 0.34);
         }
     }
 
@@ -72,24 +78,6 @@ def render_streamlit_base_style() -> None:
         color: var(--text-color);
     }
 
-    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a {
-        border-radius: 14px;
-    }
-
-    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover {
-        background: color-mix(in srgb, var(--primary-color) 10%, transparent);
-    }
-
-    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] {
-        background: linear-gradient(
-            90deg,
-            color-mix(in srgb, var(--primary-color) 20%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 14%, var(--secondary-background-color)) 55%,
-            color-mix(in srgb, #06b6d4 10%, var(--secondary-background-color)) 100%
-        );
-        border: 1px solid color-mix(in srgb, var(--primary-color) 22%, transparent);
-    }
-
     .block-container {
         max-width: none;
         padding-top: .85rem;
@@ -98,63 +86,25 @@ def render_streamlit_base_style() -> None:
         padding-right: .75rem;
     }
 
-    .wb-brand {
-        font-size: 1.65rem;
-        font-weight: 650;
-        letter-spacing: -0.03em;
-        margin-bottom: .2rem;
-    }
-
     .hero-card,
     .wb-panel,
     .wb-module-card,
     .wb-brief-card,
     .wb-stat-card,
     .wb-operator-box {
-        background: var(--wb-card-highlight);
-        border: 1.1px solid var(--wb-border);
         border-radius: 22px;
         box-shadow: var(--wb-shadow);
-        transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
-    }
-
-    .hero-card:hover,
-    .wb-panel:hover,
-    .wb-module-card:hover,
-    .wb-brief-card:hover,
-    .wb-stat-card:hover,
-    .wb-operator-box:hover {
-        border-color: var(--wb-border-strong);
-        box-shadow: var(--wb-shadow-hover);
-        transform: translateY(-1px);
+        border: 1px solid var(--wb-border);
+        overflow: hidden;
     }
 
     .hero-card {
         padding: 1.45rem 1.6rem;
         margin-bottom: 1.05rem;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--primary-color) 10%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 7%, var(--secondary-background-color)) 52%,
-            color-mix(in srgb, #06b6d4 6%, var(--secondary-background-color)) 100%
-        );
-    }
-    .hero-card::after {
-        content: "";
-        position: absolute;
-        right: -40px;
-        top: -40px;
-        width: 180px;
-        height: 180px;
-        border-radius: 999px;
-        background: radial-gradient(
-            circle,
-            color-mix(in srgb, var(--primary-color) 10%, transparent) 0%,
-            transparent 72%
-        );
-        pointer-events: none;
+        background:
+            radial-gradient(circle at top right, var(--wb-cyan) 0, transparent 28%),
+            radial-gradient(circle at left bottom, var(--wb-purple) 0, transparent 28%),
+            var(--secondary-background-color);
     }
 
     .wb-panel,
@@ -163,37 +113,37 @@ def render_streamlit_base_style() -> None:
     .wb-stat-card,
     .wb-operator-box {
         padding: 1rem 1.05rem;
+        background: var(--secondary-background-color);
     }
 
     .page-eyebrow {
         color: var(--primary-color);
         font-size: .84rem;
-        font-weight: 650;
+        font-weight: 700;
         letter-spacing: .08em;
         text-transform: uppercase;
         margin-bottom: .45rem;
     }
 
     .page-title {
-        font-size: 2.15rem;
+        font-size: 2.05rem;
         line-height: 1.08;
-        font-weight: 740;
+        font-weight: 700;
         margin: 0 0 .35rem 0;
         color: var(--text-color);
     }
 
     .page-subtitle {
         color: var(--wb-text-muted);
-        font-size: 1.03rem;
+        font-size: 1rem;
         margin: 0;
     }
 
     .section-title {
-        font-size: 1.02rem;
-        font-weight: 650;
+        font-size: 1rem;
+        font-weight: 700;
         margin-bottom: .8rem;
         color: var(--text-color);
-        letter-spacing: -0.01em;
     }
 
     .wb-hero-chip-wrap {
@@ -204,18 +154,13 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-hero-chip {
-        background: linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--primary-color) 22%, var(--secondary-background-color)),
-            color-mix(in srgb, var(--primary-color) 12%, var(--secondary-background-color))
-        );
-        border: 1px solid var(--wb-accent-border);
+        background: var(--wb-indigo);
+        border: 1px solid var(--wb-blue-border);
         color: var(--text-color);
         border-radius: 999px;
         padding: .52rem .86rem;
         font-size: .88rem;
-        font-weight: 650;
-        backdrop-filter: blur(6px);
+        font-weight: 600;
     }
 
     .wb-stat-card {
@@ -224,99 +169,56 @@ def render_streamlit_base_style() -> None:
         flex-direction: column;
         justify-content: center;
         gap: .22rem;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--primary-color) 11%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #06b6d4 7%, var(--secondary-background-color)) 100%
-        );
     }
-    .wb-stat-card::before {
-        content: "";
-        position: absolute;
-        inset: auto auto -28px -18px;
-        width: 92px;
-        height: 92px;
-        border-radius: 999px;
-        background: radial-gradient(
-            circle,
-            color-mix(in srgb, var(--primary-color) 10%, transparent) 0%,
-            transparent 72%
-        );
-        opacity: .95;
-        pointer-events: none;
+
+    /* 카드 4개 각각 눈에 보이게 색 */
+    .wb-stat-card:nth-of-type(1) {
+        background: linear-gradient(135deg, var(--wb-blue), var(--secondary-background-color) 72%);
+        border-color: var(--wb-blue-border);
+    }
+    .wb-stat-card:nth-of-type(2) {
+        background: linear-gradient(135deg, var(--wb-cyan), var(--secondary-background-color) 72%);
+        border-color: var(--wb-cyan-border);
+    }
+    .wb-stat-card:nth-of-type(3) {
+        background: linear-gradient(135deg, var(--wb-amber), var(--secondary-background-color) 72%);
+        border-color: var(--wb-amber-border);
+    }
+    .wb-stat-card:nth-of-type(4) {
+        background: linear-gradient(135deg, var(--wb-purple), var(--secondary-background-color) 72%);
+        border-color: var(--wb-purple-border);
     }
 
     .wb-stat-label {
-        font-size: .9rem;
-        font-weight: 650;
+        font-size: .92rem;
+        font-weight: 600;
         color: var(--wb-text-muted);
         margin-bottom: .18rem;
-        letter-spacing: -0.01em;
     }
 
     .wb-stat-value {
-        font-size: 1.65rem;
+        font-size: 1.55rem;
         line-height: 1.1;
-        font-weight: 650;
+        font-weight: 700;
         color: var(--text-color);
-        letter-spacing: -0.03em;
     }
 
     .wb-module-card {
         min-height: 220px;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--primary-color) 9%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 8%, var(--secondary-background-color)) 100%
-        );
     }
 
-    .wb-module-card-strong {
-        position: relative;
-    }
-    .wb-module-card-strong::after {
-        content: "";
-        position: absolute;
-        inset: auto -20px -28px auto;
-        width: 96px;
-        height: 96px;
-        border-radius: 999px;
-        background: radial-gradient(
-            circle,
-            color-mix(in srgb, #06b6d4 10%, transparent) 0%,
-            transparent 72%
-        );
-        pointer-events: none;
+    .wb-module-card-strong:nth-of-type(1) {
+        background:
+            radial-gradient(circle at right bottom, var(--wb-cyan) 0, transparent 24%),
+            linear-gradient(135deg, var(--wb-blue), var(--secondary-background-color) 68%);
+        border-color: var(--wb-blue-border);
     }
 
-    .wb-module-variant-primary .wb-module-icon {
-        background: linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--primary-color) 20%, var(--secondary-background-color)),
-            color-mix(in srgb, #06b6d4 10%, var(--background-color))
-        );
-        border: 1px solid color-mix(in srgb, var(--primary-color) 22%, transparent);
-        color: var(--text-color);
-        box-shadow:
-            inset 0 1px 0 color-mix(in srgb, white 22%, transparent),
-            0 6px 16px color-mix(in srgb, var(--primary-color) 8%, transparent);
-    }
-
-    .wb-module-variant-success .wb-module-icon {
-        background: linear-gradient(
-            180deg,
-            color-mix(in srgb, #7c3aed 18%, var(--secondary-background-color)),
-            color-mix(in srgb, #06b6d4 9%, var(--background-color))
-        );
-        border: 1px solid color-mix(in srgb, #7c3aed 22%, transparent);
-        color: var(--text-color);
-        box-shadow:
-            inset 0 1px 0 color-mix(in srgb, white 22%, transparent),
-            0 6px 16px color-mix(in srgb, #7c3aed 8%, transparent);
+    .wb-module-card-strong:nth-of-type(2) {
+        background:
+            radial-gradient(circle at right bottom, var(--wb-purple) 0, transparent 24%),
+            linear-gradient(135deg, var(--wb-rose), var(--secondary-background-color) 68%);
+        border-color: var(--wb-purple-border);
     }
 
     .wb-module-head {
@@ -335,6 +237,14 @@ def render_streamlit_base_style() -> None:
         justify-content: center;
         font-size: 1.35rem;
         flex-shrink: 0;
+        background: rgba(255,255,255,0.45);
+        backdrop-filter: blur(8px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .wb-module-icon {
+            background: rgba(255,255,255,0.06);
+        }
     }
 
     .wb-module-list {
@@ -349,43 +259,34 @@ def render_streamlit_base_style() -> None:
 
     .wb-brief-card {
         min-height: 132px;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(
-            135deg,
-            color-mix(in srgb, #7c3aed 10%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #06b6d4 7%, var(--secondary-background-color)) 100%
-        );
     }
-    .wb-brief-card::before {
-        content: "";
-        position: absolute;
-        inset: auto -18px -26px auto;
-        width: 88px;
-        height: 88px;
-        border-radius: 999px;
-        background: radial-gradient(
-            circle,
-            color-mix(in srgb, #7c3aed 10%, transparent) 0%,
-            transparent 74%
-        );
-        pointer-events: none;
+
+    .wb-brief-card:nth-of-type(1) {
+        background: linear-gradient(135deg, var(--wb-green), var(--secondary-background-color) 72%);
+        border-color: var(--wb-green-border);
+    }
+    .wb-brief-card:nth-of-type(2) {
+        background: linear-gradient(135deg, var(--wb-purple), var(--secondary-background-color) 72%);
+        border-color: var(--wb-purple-border);
+    }
+    .wb-brief-card:nth-of-type(3) {
+        background: linear-gradient(135deg, var(--wb-cyan), var(--secondary-background-color) 72%);
+        border-color: var(--wb-cyan-border);
     }
 
     .wb-brief-label {
         font-size: .9rem;
-        font-weight: 650;
+        font-weight: 600;
         color: var(--wb-text-muted);
         margin-bottom: .4rem;
     }
 
     .wb-brief-value {
-        font-size: 1.95rem;
-        font-weight: 650;
+        font-size: 1.9rem;
+        font-weight: 700;
         line-height: 1;
         color: var(--text-color);
         margin-bottom: .48rem;
-        letter-spacing: -0.03em;
     }
 
     .wb-brief-desc {
@@ -402,22 +303,22 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-operator-badge {
-        background: var(--wb-accent-soft);
-        border: 1px solid var(--wb-accent-border);
+        background: var(--wb-indigo);
+        border: 1px solid var(--wb-blue-border);
         border-radius: 999px;
         padding: .45rem .8rem;
         font-size: .85rem;
-        font-weight: 650;
+        font-weight: 600;
     }
 
     .wb-operator-state {
         font-size: .95rem;
-        font-weight: 650;
+        font-weight: 600;
     }
 
     .wb-operator-name {
         font-size: 2rem;
-        font-weight: 650;
+        font-weight: 700;
         margin-bottom: .35rem;
     }
 
@@ -448,8 +349,9 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-operator-chip strong {
-        font-size: 1.05rem;
+        font-size: 1.02rem;
         color: var(--text-color);
+        font-weight: 700;
     }
 
     .stButton > button,
@@ -457,32 +359,33 @@ def render_streamlit_base_style() -> None:
         width: 100%;
         min-height: 46px;
         font-size: 1rem;
-        font-weight: 650;
+        font-weight: 600;
         white-space: nowrap;
         border-radius: 14px !important;
         border: 1px solid var(--wb-border) !important;
-        background: linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--secondary-background-color) 86%, white),
-            var(--secondary-background-color)
-        ) !important;
+        background: linear-gradient(135deg, var(--wb-indigo), var(--secondary-background-color)) !important;
         color: var(--text-color) !important;
-        box-shadow: 0 6px 16px color-mix(in srgb, black 6%, transparent) !important;
-        transition: all .16s ease !important;
+        box-shadow: none !important;
     }
 
     .stButton > button:hover,
     .stFormSubmitButton > button:hover {
-        border-color: color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
+        border-color: var(--wb-blue-border) !important;
+        background: linear-gradient(135deg, var(--wb-blue), var(--wb-cyan)) !important;
         color: var(--text-color) !important;
-        background: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--primary-color) 10%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 7%, var(--secondary-background-color)) 58%,
-            color-mix(in srgb, #06b6d4 5%, var(--secondary-background-color)) 100%
-        ) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 10px 22px color-mix(in srgb, var(--primary-color) 10%, transparent) !important;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a {
+        border-radius: 14px;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover {
+        background: linear-gradient(90deg, var(--wb-indigo), transparent);
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] {
+        background: linear-gradient(90deg, var(--wb-blue), var(--wb-purple));
+        border: 1px solid var(--wb-blue-border);
     }
 
     .stTextInput input,
