@@ -437,6 +437,62 @@ def render_streamlit_base_style() -> None:
     [data-testid="collapsedControl"] {
         border-radius: 12px !important;
     }
+    
+/* mypage */
+.wb-info-panel,
+.wb-action-panel {
+    padding: 1.05rem 1.1rem;
+}
+
+.wb-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.wb-info-item {
+    background: linear-gradient(135deg, var(--wb-blue), var(--secondary-background-color) 72%);
+    border: 1px solid var(--wb-blue-border);
+    border-radius: 16px;
+    padding: .95rem 1rem;
+    min-height: 96px;
+}
+
+.wb-info-item:nth-child(2n) {
+    background: linear-gradient(135deg, var(--wb-purple), var(--secondary-background-color) 72%);
+    border-color: var(--wb-purple-border);
+}
+
+.wb-info-label {
+    font-size: .9rem;
+    font-weight: 600;
+    margin-bottom: .45rem;
+    opacity: .78;
+}
+
+.wb-info-value {
+    font-size: 1.18rem;
+    font-weight: 700;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.wb-action-panel .stForm {
+    margin-bottom: 0;
+}
+
+.wb-action-panel [data-testid="stForm"] {
+    background: transparent;
+    border: 0;
+    padding: 0;
+}
+
+@media (max-width: 900px) {
+    .wb-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)

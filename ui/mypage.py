@@ -1,5 +1,6 @@
-
 from __future__ import annotations
+
+import html
 
 import pandas as pd
 import streamlit as st
@@ -24,7 +25,20 @@ RANK_OPTIONS = [
 ]
 
 
-def render_mypage_dashboard():
+def _safe(value: object) -> str:
+    return html.escape(str(value if value not in (None, "") else "-"))
+
+
+def _info_item(label: str, value: object) -> str:
+    return f"""
+    <div class="wb-info-item">
+        <div class="wb-info-label">{html.escape(label)}</div>
+        <div class="wb-info-value">{_safe(value)}</div>
+    </div>
+    """
+
+
+def render_mypage_dashboard() -> None:
     user = get_current_user() or {}
     if user.get("service_number"):
         fresh = get_user_fresh(user["service_number"])
@@ -34,13 +48,13 @@ def render_mypage_dashboard():
             user = st.session_state["user"]
 
     st.markdown(
-        '''
+        """
         <div class="hero-card">
             <div class="page-eyebrow">OPERATOR PROFILE</div>
             <div class="page-title" style="font-size:1.9rem;">마이페이지</div>
-            <div class="page-subtitle">기본 정보, 계급, 비밀번호, 접속 로그를 관리합니다.</div>
+            <div class="page-subtitle">기본 정보, 계급, 비밀번호, 접속 로그를 한 곳에서 관리합니다.</div>
         </div>
-        ''',
+        """,
         unsafe_allow_html=True,
     )
 
@@ -48,49 +62,61 @@ def render_mypage_dashboard():
         st.info("로그인이 필요합니다.")
         return
 
-    top_left, top_right = st.columns([1.15, 0.85], gap="large")
-    with top_left:
-        st.markdown('<div class="section-title">기본 정보</div>', unsafe_allow_html=True)
-        st.markdown(
-            f'''
-            <div class="wb-info-grid">
-                <div class="wb-info-item"><div class="wb-info-label">이름</div><div class="wb-info-value">{user.get("username", "-")}</div></div>
-                <div class="wb-info-item"><div class="wb-info-label">군번</div><div class="wb-info-value">{user.get("service_number", "-")}</div></div>
-                <div class="wb-info-item"><div class="wb-info-label">부대</div><div class="wb-info-value">{user.get("unit_id", "-")}</div></div>
-                <div class="wb-info-item"><div class="wb-info-label">권한</div><div class="wb-info-value">{user.get("role", "-")}</div></div>
-                <div class="wb-info-item"><div class="wb-info-label">계급</div><div class="wb-info-value">{user.get("military_rank") or "미설정"}</div></div>
-            </div>
-            ''',
-            unsafe_allow_html=True,
-        )
+    left, right = st.columns([1.2, 0.8], gap="large")
 
-    with top_right:
+    with left:
+        st.markdown('<div class="section-title">기본 정보</div>', unsafe_allow_html=True)
+        info_html = "".join(
+            [
+                _info_item("이름", user.get("username")),
+                _info_item("군번", user.get("service_number")),
+                _info_item("부대", user.get("unit_id")),
+                _info_item("권한", user.get("role")),
+                _info_item("계급", user.get("military_rank") or "미설정"),
+            ]
+        )
+        st.markdown(f'<div class="wb-panel wb-info-panel"><div class="wb-info-grid">{info_html}</div></div>', unsafe_allow_html=True)
+
+    with right:
         st.markdown('<div class="section-title">계급 변경</div>', unsafe_allow_html=True)
         current_rank = user.get("military_rank") or "미설정"
         idx = RANK_OPTIONS.index(current_rank) if current_rank in RANK_OPTIONS else 0
-        new_rank = st.selectbox("계급", RANK_OPTIONS, index=idx)
-        if st.button("계급 저장", key="rank_save_btn"):
+
+        st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
+        with st.form("rank_update_form", clear_on_submit=False):
+            new_rank = st.selectbox("계급", RANK_OPTIONS, index=idx)
+            rank_submit = st.form_submit_button("계급 저장", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        if rank_submit:
             ok, msg = update_rank(user["service_number"], None if new_rank == "미설정" else new_rank)
             (st.success if ok else st.error)(msg)
             if ok:
-                st.rerun()
+                st.switch_page("pages/my_page.py")
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">비밀번호 변경</div>', unsafe_allow_html=True)
-    p1, p2 = st.columns(2, gap="large")
-    with p1:
-        cur = st.text_input("현재 비밀번호", type="password")
-    with p2:
-        new = st.text_input("새 비밀번호", type="password")
-    if st.button("비밀번호 변경", key="pw_change_btn"):
+    st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
+    with st.form("change_password_form", clear_on_submit=True):
+        p1, p2 = st.columns(2, gap="large")
+        with p1:
+            cur = st.text_input("현재 비밀번호", type="password")
+        with p2:
+            new = st.text_input("새 비밀번호", type="password")
+        pw_submit = st.form_submit_button("비밀번호 변경", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    if pw_submit:
         ok, msg = change_password(user["service_number"], cur, new)
         (st.success if ok else st.error)(msg)
 
-
     st.markdown('<div class="section-title" style="margin-top:1rem;">계정 관리</div>', unsafe_allow_html=True)
     with st.expander("탈퇴하기", expanded=False):
-        st.caption("탈퇴는 마이페이지에서만 가능합니다. 처리 후 즉시 로그아웃됩니다.")
-        delete_pw = st.text_input("탈퇴 확인용 비밀번호", type="password")
-        if st.button("탈퇴하기", key="delete_account_btn"):
+        st.markdown('<div class="wb-panel wb-action-panel">', unsafe_allow_html=True)
+        with st.form("delete_account_form", clear_on_submit=True):
+            st.caption("탈퇴는 마이페이지에서만 가능합니다. 처리 후 즉시 로그아웃됩니다.")
+            delete_pw = st.text_input("탈퇴 확인용 비밀번호", type="password")
+            delete_submit = st.form_submit_button("탈퇴하기", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        if delete_submit:
             ok, msg = delete_user(user["service_number"], delete_pw)
             (st.success if ok else st.error)(msg)
             if ok:
@@ -99,6 +125,8 @@ def render_mypage_dashboard():
     labels = ["내 접속 기록", "내 감사 로그"]
     if user.get("role") in {"admin", "officer"}:
         labels += ["전체 접속 로그", "전체 감사 로그"]
+
+    st.markdown('<div class="section-title" style="margin-top:1rem;">기록 조회</div>', unsafe_allow_html=True)
     tabs = st.tabs(labels)
     with tabs[0]:
         render_access_logs_table(pd.DataFrame(get_my_access_logs()))
