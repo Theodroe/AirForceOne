@@ -32,7 +32,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import streamlit as st
-
+from functools import lru_cache
 from services import init_session
 from ui import render_sidebar_ui, render_streamlit_base_style
 import pandas as pd
@@ -99,6 +99,26 @@ if weather_df is None or weather_df.empty:
         for err in st.session_state["api_errors"]:
             st.warning(err)
     st.stop()
+    weather_df = weather_df.copy()
+    weather_df["시간"] = weather_df["시간"].astype(str).str.zfill(2)
+    weather_df = weather_df.sort_values(["지역", "날짜", "시간"]).reset_index(drop=True)
+
+    weather_lookup = {
+        (r["지역"], r["날짜"], r["시간"]): r
+        for _, r in weather_df.iterrows()
+    }
+
+    region_date_lookup = {
+        (region, date): sdf.copy()
+        for (region, date), sdf in weather_df.groupby(["지역", "날짜"], sort=False)
+    }
+
+    @lru_cache(maxsize=256)
+    def get_region_date_df(region: str, date: str) -> pd.DataFrame:
+        return region_date_lookup.get((region, date), pd.DataFrame()).copy()
+
+    def get_row(region: str, date: str, hour: str):
+        return weather_lookup.get((region, date, hour))
 
 now        = datetime.now()
 dates      = sorted(weather_df["날짜"].unique().tolist())
@@ -133,10 +153,11 @@ alert_stats = {}
 if SPECIAL_AVAILABLE:
     with st.spinner("📡 특보 데이터 수집 중..."):
         enriched_df, active_df, alert_stats = load_special_report()
-    if not enriched_df.empty:
+
+    special_saved_key = f"special_saved_for_{datetime.now().strftime('%Y%m%d%H')}"
+    if not enriched_df.empty and not st.session_state.get(special_saved_key, False):
         save_special_report(enriched_df)
-else:
-    st.sidebar.warning(f"특보 모듈 로드 실패: {SPECIAL_ERROR}")
+        st.session_state[special_saved_key] = True
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 3. 헤더 — 타이틀 + 지역 선택 + 현재 시각
@@ -196,10 +217,10 @@ date_tab_labels = [
 # 4. 공용 데이터 준비
 # ══════════════════════════════════════════════════════════════════════════════
 
-rdf_today = weather_df[(weather_df["지역"] == region) & (weather_df["날짜"] == dates[0])]
+rdf_today = get_region_date_df(region, dates[0])
 avail_hrs = rdf_today["시간"].tolist()
-cur_hr    = use_hr if use_hr in avail_hrs else (avail_hrs[0] if avail_hrs else "06")
-cur_row   = rdf_today[rdf_today["시간"] == cur_hr]
+cur_hr = use_hr if use_hr in avail_hrs else (avail_hrs[0] if avail_hrs else "06")
+cur_row_obj = get_row(region, dates[0], cur_hr)
 
 region_active_df = (
     filter_timeline_by_region(active_df, region)

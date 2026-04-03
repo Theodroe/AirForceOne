@@ -8,9 +8,9 @@ import numpy as np
 import pandas as pd
 import requests
 import streamlit as st
-from xml.etree import ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-
+from xml.etree import ElementTree as ET
 from utils.best_train.config import (
     SERVICE_KEY,
     AREA_INFO,
@@ -65,57 +65,60 @@ def _fetch_area(
     """
     params = _build_params(base_date, base_time, info['nx'], info['ny'])
     try:
-        time.sleep(np.random.uniform(0.1, 0.5))
-        res = requests.get(API_URL, params=params, headers=_REQUEST_HEADERS, timeout=15)
+        res = requests.get(API_URL, params=params, headers=_REQUEST_HEADERS, timeout=10)
         res.raise_for_status()
         root = ET.fromstring(res.content)
 
-        result_code = root.find('.//resultCode')
-        if result_code is not None and (result_code.text or '').strip() != '00':
-            msg = root.find('.//resultMsg')
+        result_code = root.find(".//resultCode")
+        if result_code is not None and (result_code.text or "").strip() != "00":
+            msg = root.find(".//resultMsg")
             return [], f"{name}: {(msg.text or 'API 오류').strip() if msg is not None else 'API 오류'}"
 
-        items = root.findall('.//item')
+        items = root.findall(".//item")
         if not items:
             return [], f"{name}: 데이터 없음"
 
         # ── 시간별 데이터 누적 ─────────────────────────────────────────
-        temp_dict: dict[tuple, dict] = {}
+        temp_dict: dict[tuple[str, str], dict] = {}
+
         for item in items:
-            f_date = (item.findtext('fcstDate') or '').strip()
+            f_date = (item.findtext("fcstDate") or "").strip()
             if f_date not in target_dates:
                 continue
-            f_time = (item.findtext('fcstTime') or '').strip()[:2]
-            cat    = (item.findtext('category') or '').strip()
-            val_text = (item.findtext('fcstValue') or '').strip()
-            if not val_text:
-                continue
+
+            f_time = (item.findtext("fcstTime") or "").strip()[:2]
+            cat = (item.findtext("category") or "").strip()
+            val_text = (item.findtext("fcstValue") or "").strip()
 
             col_name = _CATEGORY_MAP.get(cat)
-            if col_name is None:
+            if col_name is None or not val_text:
                 continue
 
             date_key = f"{int(f_date[4:6])}/{int(f_date[6:8])}"
             key = (date_key, f_time)
-            temp_dict.setdefault(key, {})
+
+            if key not in temp_dict:
+                temp_dict[key] = {}
+
             try:
                 temp_dict[key][col_name] = float(val_text)
             except ValueError:
-                pass
+                continue
 
-        rows = []
+        rows: list[dict] = []
         for (date, hour), v in temp_dict.items():
-            if '기온' not in v:
+            if "기온" not in v:
                 continue
             rows.append({
-                '지역':  name,
-                '날짜':  date,
-                '시간':  hour,
-                '기온':  v.get('기온',   0.0),
-                '풍속':  v.get('풍속',   0.0),
-                '습도':  v.get('습도',   0.0),
-                '강수량': v.get('강수량', 0.0),
+                "지역": name,
+                "날짜": date,
+                "시간": hour,
+                "기온": float(v.get("기온", 0.0)),
+                "풍속": float(v.get("풍속", 0.0)),
+                "습도": float(v.get("습도", 0.0)),
+                "강수량": float(v.get("강수량", 0.0)),
             })
+
         return rows, None
 
     except Exception as e:
@@ -138,32 +141,45 @@ def get_weather_data() -> pd.DataFrame:
     데이터가 전혀 없으면 빈 DataFrame 반환.
     """
     now = datetime.now()
-    yesterday  = now - timedelta(days=1)
-    base_date  = yesterday.strftime('%Y%m%d')
-    base_time  = "2300"
-    target_dates = [(now + timedelta(days=i)).strftime('%Y%m%d') for i in range(3)]
+    yesterday = now - timedelta(days=1)
+    base_date = yesterday.strftime("%Y%m%d")
+    base_time = "2300"
+    target_dates = [(now + timedelta(days=i)).strftime("%Y%m%d") for i in range(3)]
 
     all_rows: list[dict] = []
-    errors:   list[str]  = []
+    errors: list[str] = []
 
-    for name, info in AREA_INFO.items():
-        rows, err = _fetch_area(name, info, base_date, base_time, target_dates)
-        all_rows.extend(rows)
-        if err:
-            errors.append(err)
+    futures = []
+    max_workers = min(8, max(1, len(AREA_INFO)))
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for name, info in AREA_INFO.items():
+            futures.append(
+                executor.submit(_fetch_area, name, info, base_date, base_time, target_dates)
+            )
+
+        for future in as_completed(futures):
+            rows, err = future.result()
+            if rows:
+                all_rows.extend(rows)
+            if err:
+                errors.append(err)
 
     if errors:
-        st.session_state['api_errors'] = errors
+        st.session_state["api_errors"] = errors
 
-    _empty = pd.DataFrame(columns=['지역', '날짜', '시간', '기온', '풍속', '습도', '강수량'])
-    _empty.attrs['base_date'] = base_date
-    _empty.attrs['base_time'] = base_time
+    empty_df = pd.DataFrame(columns=["지역", "날짜", "시간", "기온", "풍속", "습도", "강수량"])
+    empty_df.attrs["base_date"] = base_date
+    empty_df.attrs["base_time"] = base_time
 
     if not all_rows:
-        return _empty
+        return empty_df
 
     df = pd.DataFrame(all_rows)
+    df["시간"] = df["시간"].astype(str).str.zfill(2)
+    df = df.sort_values(["지역", "날짜", "시간"]).reset_index(drop=True)
     df = compute_apparent_temperatures(df)
-    df.attrs['base_date'] = base_date
-    df.attrs['base_time'] = base_time
+
+    df.attrs["base_date"] = base_date
+    df.attrs["base_time"] = base_time
     return df
