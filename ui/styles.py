@@ -12,6 +12,8 @@ def render_streamlit_base_style() -> None:
         --wb-border: rgba(120, 130, 150, 0.22);
         --wb-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
         --wb-text-muted: rgba(31, 41, 55, 0.72);
+        --wb-accent-soft: color-mix(in srgb, var(--primary-color) 10%, transparent);
+        --wb-accent-border: color-mix(in srgb, var(--primary-color) 26%, transparent);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -65,6 +67,7 @@ def render_streamlit_base_style() -> None:
     .wb-panel,
     .wb-module-card,
     .wb-brief-card,
+    .wb-stat-card,
     .wb-operator-box {
         background: var(--secondary-background-color);
         border: 1px solid var(--wb-border);
@@ -80,6 +83,7 @@ def render_streamlit_base_style() -> None:
     .wb-panel,
     .wb-module-card,
     .wb-brief-card,
+    .wb-stat-card,
     .wb-operator-box {
         padding: 1rem 1.05rem;
     }
@@ -120,13 +124,50 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-hero-chip {
-        background: rgba(47, 111, 237, 0.10);
-        border: 1px solid rgba(47, 111, 237, 0.24);
+        background: var(--wb-accent-soft);
+        border: 1px solid var(--wb-accent-border);
         color: var(--text-color);
         border-radius: 999px;
         padding: .5rem .8rem;
         font-size: .9rem;
         font-weight: 700;
+    }
+
+    .wb-stat-card {
+        min-height: 92px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: .2rem;
+    }
+
+    .wb-stat-label {
+        font-size: .92rem;
+        font-weight: 700;
+        color: var(--wb-text-muted);
+        margin-bottom: .15rem;
+    }
+
+    .wb-stat-value {
+        font-size: 1.45rem;
+        line-height: 1.15;
+        font-weight: 800;
+        color: var(--text-color);
+    }
+
+    .wb-module-card {
+        min-height: 220px;
+    }
+
+    .wb-module-card-strong {
+        position: relative;
+    }
+
+    .wb-module-variant-primary .wb-module-icon,
+    .wb-module-variant-success .wb-module-icon {
+        background: var(--wb-accent-soft);
+        border: 1px solid var(--wb-accent-border);
+        color: var(--text-color);
     }
 
     .wb-module-head {
@@ -144,17 +185,21 @@ def render_streamlit_base_style() -> None:
         align-items: center;
         justify-content: center;
         font-size: 1.35rem;
-        color: #ffffff;
         flex-shrink: 0;
     }
 
     .wb-module-list {
         margin: 0;
         padding-left: 1.2rem;
+        color: var(--text-color);
     }
 
     .wb-module-list li {
         margin-bottom: .35rem;
+    }
+
+    .wb-brief-card {
+        min-height: 124px;
     }
 
     .wb-brief-label {
@@ -186,7 +231,7 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-operator-badge {
-        background: rgba(47, 111, 237, 0.10);
+        background: var(--wb-accent-soft);
         border-radius: 999px;
         padding: .45rem .8rem;
         font-size: .85rem;
@@ -253,7 +298,7 @@ def render_streamlit_base_style() -> None:
     .stFormSubmitButton > button:hover {
         border-color: var(--primary-color) !important;
         color: var(--primary-color) !important;
-        background: rgba(47, 111, 237, 0.08) !important;
+        background: var(--wb-accent-soft) !important;
     }
 
     .stTextInput input,

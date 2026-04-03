@@ -9,7 +9,15 @@ from services import load_data
 from ui.summary_cards import render_summary_cards
 
 
-def _module_card(title: str, subtitle: str, bullets: list[str], button_label: str, target: str, emoji: str, variant: str) -> None:
+def _module_card(
+    title: str,
+    subtitle: str,
+    bullets: list[str],
+    button_label: str,
+    target: str,
+    emoji: str,
+    variant: str,
+) -> None:
     bullet_html = "".join(f"<li>{html.escape(item)}</li>" for item in bullets)
     st.markdown(
         f"""
@@ -26,8 +34,7 @@ def _module_card(title: str, subtitle: str, bullets: list[str], button_label: st
         """,
         unsafe_allow_html=True,
     )
-    if st.button(button_label, key=f"open::{target}", use_container_width=True):
-        st.switch_page(target)
+    st.button(button_label, key=f"open::{target}", use_container_width=True, on_click=st.switch_page, args=(target,))
 
 
 def _brief_card(title: str, value: str, desc: str) -> None:
