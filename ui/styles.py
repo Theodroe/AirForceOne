@@ -7,20 +7,38 @@ def render_streamlit_base_style() -> None:
     css = """
     <style>
     :root {
-        --wb-radius: 18px;
-        --wb-radius-sm: 12px;
-        --wb-border: rgba(120, 130, 150, 0.22);
-        --wb-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
-        --wb-text-muted: rgba(31, 41, 55, 0.72);
-        --wb-accent-soft: color-mix(in srgb, var(--primary-color) 10%, transparent);
-        --wb-accent-border: color-mix(in srgb, var(--primary-color) 26%, transparent);
+        --wb-radius: 20px;
+        --wb-radius-sm: 14px;
+        --wb-border: color-mix(in srgb, var(--text-color) 14%, transparent);
+        --wb-border-strong: color-mix(in srgb, var(--text-color) 22%, transparent);
+        --wb-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
+        --wb-shadow-hover: 0 18px 40px rgba(15, 23, 42, 0.14);
+        --wb-text-muted: color-mix(in srgb, var(--text-color) 72%, transparent);
+        --wb-accent-soft: color-mix(in srgb, var(--primary-color) 12%, var(--secondary-background-color));
+        --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 7%, var(--background-color));
+        --wb-accent-border: color-mix(in srgb, var(--primary-color) 28%, transparent);
+        --wb-card-highlight: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--primary-color) 5%, var(--secondary-background-color)) 0%,
+            var(--secondary-background-color) 100%
+        );
     }
 
     @media (prefers-color-scheme: dark) {
         :root {
-            --wb-border: rgba(255, 255, 255, 0.12);
-            --wb-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
-            --wb-text-muted: rgba(255, 255, 255, 0.72);
+            --wb-border: color-mix(in srgb, white 12%, transparent);
+            --wb-border-strong: color-mix(in srgb, white 18%, transparent);
+            --wb-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
+            --wb-shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.42);
+            --wb-text-muted: color-mix(in srgb, var(--text-color) 74%, transparent);
+            --wb-accent-soft: color-mix(in srgb, var(--primary-color) 16%, var(--secondary-background-color));
+            --wb-accent-soft-2: color-mix(in srgb, var(--primary-color) 10%, var(--background-color));
+            --wb-accent-border: color-mix(in srgb, var(--primary-color) 34%, transparent);
+            --wb-card-highlight: linear-gradient(
+                180deg,
+                color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color)) 0%,
+                var(--secondary-background-color) 100%
+            );
         }
     }
 
@@ -69,15 +87,44 @@ def render_streamlit_base_style() -> None:
     .wb-brief-card,
     .wb-stat-card,
     .wb-operator-box {
-        background: var(--secondary-background-color);
-        border: 1.5px solid var(--wb-border);
-        border-radius: 20px;
+        background: var(--wb-card-highlight);
+        border: 1.4px solid var(--wb-border);
+        border-radius: 22px;
         box-shadow: var(--wb-shadow);
+        transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .hero-card:hover,
+    .wb-panel:hover,
+    .wb-module-card:hover,
+    .wb-brief-card:hover,
+    .wb-stat-card:hover,
+    .wb-operator-box:hover {
+        border-color: var(--wb-border-strong);
+        box-shadow: var(--wb-shadow-hover);
+        transform: translateY(-1px);
     }
 
     .hero-card {
-        padding: 1.3rem 1.45rem;
-        margin-bottom: 1rem;
+        padding: 1.45rem 1.6rem;
+        margin-bottom: 1.05rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-card::after {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--primary-color) 60%, transparent),
+            color-mix(in srgb, var(--primary-color) 18%, transparent)
+        );
+        opacity: .9;
+        pointer-events: none;
     }
 
     .wb-panel,
@@ -90,9 +137,11 @@ def render_streamlit_base_style() -> None:
 
     .page-eyebrow {
         color: var(--primary-color);
-        font-size: .92rem;
-        font-weight: 700;
-        margin-bottom: .35rem;
+        font-size: .84rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin-bottom: .45rem;
     }
 
     .page-title {
@@ -110,10 +159,11 @@ def render_streamlit_base_style() -> None:
     }
 
     .section-title {
-        font-size: 1.03rem;
+        font-size: 1.02rem;
         font-weight: 800;
-        margin-bottom: .7rem;
+        margin-bottom: .8rem;
         color: var(--text-color);
+        letter-spacing: -0.01em;
     }
 
     .wb-hero-chip-wrap {
@@ -128,57 +178,98 @@ def render_streamlit_base_style() -> None:
         border: 1px solid var(--wb-accent-border);
         color: var(--text-color);
         border-radius: 999px;
-        padding: .5rem .8rem;
-        font-size: .9rem;
+        padding: .52rem .86rem;
+        font-size: .88rem;
         font-weight: 700;
+        backdrop-filter: blur(6px);
     }
 
     .wb-stat-card {
-        min-height: 92px;
+        min-height: 98px;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: .2rem;
+        gap: .22rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .wb-stat-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--primary-color) 52%, transparent),
+            color-mix(in srgb, var(--primary-color) 10%, transparent)
+        );
+        opacity: .95;
     }
 
     .wb-stat-label {
-        font-size: .92rem;
-        font-weight: 700;
-        margin-bottom: .15rem;
+        font-size: .9rem;
+        font-weight: 800;
+        color: var(--wb-text-muted);
+        margin-bottom: .18rem;
+        letter-spacing: -0.01em;
     }
 
     .wb-stat-value {
-        font-size: 1.45rem;
-        line-height: 1.15;
-        font-weight: 800;
+        font-size: 1.65rem;
+        line-height: 1.1;
+        font-weight: 900;
+        color: var(--text-color);
+        letter-spacing: -0.03em;
     }
 
     .wb-module-card {
         min-height: 220px;
+        position: relative;
+        overflow: hidden;
     }
 
     .wb-module-card-strong {
         position: relative;
     }
 
+    .wb-module-card-strong::after {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--primary-color) 50%, transparent),
+            transparent
+        );
+        opacity: .85;
+    }
+
     .wb-module-variant-primary .wb-module-icon,
     .wb-module-variant-success .wb-module-icon {
-        background: var(--wb-accent-soft);
+        background: linear-gradient(
+            180deg,
+            var(--wb-accent-soft),
+            var(--wb-accent-soft-2)
+        );
         border: 1px solid var(--wb-accent-border);
         color: var(--text-color);
+        box-shadow: inset 0 1px 0 color-mix(in srgb, white 24%, transparent);
     }
 
     .wb-module-head {
         display: flex;
-        gap: .8rem;
+        gap: .9rem;
         align-items: flex-start;
-        margin-bottom: .9rem;
+        margin-bottom: 1rem;
     }
 
     .wb-module-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
+        width: 50px;
+        height: 50px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -197,22 +288,37 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-brief-card {
-        min-height: 124px;
+        min-height: 132px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .wb-brief-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--primary-color) 48%, transparent),
+            color-mix(in srgb, var(--primary-color) 8%, transparent)
+        );
     }
 
     .wb-brief-label {
         font-size: .9rem;
-        font-weight: 700;
+        font-weight: 800;
         color: var(--wb-text-muted);
-        margin-bottom: .35rem;
+        margin-bottom: .4rem;
     }
 
     .wb-brief-value {
-        font-size: 1.9rem;
-        font-weight: 800;
+        font-size: 1.95rem;
+        font-weight: 900;
         line-height: 1;
         color: var(--text-color);
-        margin-bottom: .45rem;
+        margin-bottom: .48rem;
+        letter-spacing: -0.03em;
     }
 
     .wb-brief-desc {
@@ -230,6 +336,7 @@ def render_streamlit_base_style() -> None:
 
     .wb-operator-badge {
         background: var(--wb-accent-soft);
+        border: 1px solid var(--wb-accent-border);
         border-radius: 999px;
         padding: .45rem .8rem;
         font-size: .85rem;
@@ -281,22 +388,29 @@ def render_streamlit_base_style() -> None:
     .stButton > button,
     .stFormSubmitButton > button {
         width: 100%;
-        min-height: 44px;
+        min-height: 46px;
         font-size: 1rem;
         font-weight: 700;
         white-space: nowrap;
         border-radius: 14px !important;
-        border: 1px solid var(--wb-border) !important;
-        background: var(--secondary-background-color) !important;
+        border: 1.2px solid var(--wb-border) !important;
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--secondary-background-color) 86%, white),
+            var(--secondary-background-color)
+        ) !important;
         color: var(--text-color) !important;
-        box-shadow: none !important;
+        box-shadow: 0 6px 16px color-mix(in srgb, black 6%, transparent) !important;
+        transition: all .16s ease !important;
     }
 
     .stButton > button:hover,
     .stFormSubmitButton > button:hover {
-        border-color: var(--primary-color) !important;
-        color: var(--primary-color) !important;
+        border-color: var(--wb-accent-border) !important;
+        color: var(--text-color) !important;
         background: var(--wb-accent-soft) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px color-mix(in srgb, black 10%, transparent) !important;
     }
 
     .stTextInput input,
