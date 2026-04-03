@@ -11,18 +11,33 @@ def render_login_page():
     init_session()
     render_auth_header('◈ SECURE ACCESS PORTAL ◈', '시스템', '로그인', '인가된 사용자만 접근할 수 있습니다.')
     with render_auth_card():
-        sn = st.text_input('군번')
-        pw = st.text_input('비밀번호', type='password')
-        if st.button('로그인', use_container_width=True):
+        with st.form("login_form", clear_on_submit=False):
+            sn = st.text_input('군번')
+            pw = st.text_input('비밀번호', type='password')
+            submit = st.form_submit_button('로그인', use_container_width=True)
+
+        if submit:
             ok, msg = login_user(sn, pw)
             (st.success if ok else st.error)(msg)
             if ok:
-                st.rerun()
+                st.switch_page("app.py")
+
+        c1, c2 = st.columns(2)
+        with c1:
+            st.page_link("pages/register_page.py", label="가입하기", use_container_width=True)
+        with c2:
+            st.page_link("pages/my_page.py", label="마이페이지", use_container_width=True)
     render_auth_footer()
 
 
 def render_register_page():
-    render_auth_header('◈ ACCOUNT ENROLLMENT ◈', '신규 계정', '등록', '권한(admin 포함)은 직접 선택할 수 없고 군번 형식으로 자동 판정됩니다.', show_status=False)
+    render_auth_header(
+        '◈ ACCOUNT ENROLLMENT ◈',
+        '신규 계정',
+        '등록',
+        '권한(admin 포함)은 직접 선택할 수 없고 군번 형식으로 자동 판정됩니다.',
+        show_status=False,
+    )
     with render_auth_card():
         with st.form('register_form'):
             units = get_all_units()
@@ -38,9 +53,9 @@ def render_register_page():
             password = st.text_input('비밀번호', type='password')
             st.caption('권한은 선택하지 않습니다. 군번 뒷자리 길이로 자동 판정됩니다.')
             submit = st.form_submit_button('회원가입', use_container_width=True)
-            if submit:
-                ok, msg = register_user(unit_id, username, service_number, password)
-                (st.success if ok else st.error)(msg)
+        if submit:
+            ok, msg = register_user(unit_id, username, service_number, password)
+            (st.success if ok else st.error)(msg)
     render_auth_footer()
 
 
@@ -51,9 +66,9 @@ def render_delete_page():
         service_number = st.text_input('군번', value=current.get('service_number', ''))
         password = st.text_input('비밀번호', type='password')
         submit = st.form_submit_button('계정 삭제')
-        if submit:
-            ok, msg = delete_user(service_number, password)
-            (st.success if ok else st.error)(msg)
+    if submit:
+        ok, msg = delete_user(service_number, password)
+        (st.success if ok else st.error)(msg)
 
 
 def render_mypage_page():

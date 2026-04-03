@@ -7,24 +7,19 @@ def render_streamlit_base_style() -> None:
     css = """
     <style>
     :root {
-        --wb-radius: 20px;
-        --wb-radius-sm: 14px;
         --wb-border: rgba(120, 130, 150, 0.18);
         --wb-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
-        --wb-text-muted: rgba(31, 41, 55, 0.72);
 
-        /* 눈에 보이는 색 */
         --wb-blue: #dbeafe;
-        --wb-indigo: #e0e7ff;
-        --wb-purple: #f3e8ff;
         --wb-cyan: #cffafe;
-        --wb-rose: #ffe4e6;
+        --wb-purple: #f3e8ff;
         --wb-amber: #fef3c7;
         --wb-green: #dcfce7;
+        --wb-rose: #ffe4e6;
 
         --wb-blue-border: #93c5fd;
-        --wb-purple-border: #c4b5fd;
         --wb-cyan-border: #67e8f9;
+        --wb-purple-border: #c4b5fd;
         --wb-amber-border: #fcd34d;
         --wb-green-border: #86efac;
         --wb-rose-border: #fda4af;
@@ -32,25 +27,22 @@ def render_streamlit_base_style() -> None:
 
     @media (prefers-color-scheme: dark) {
         :root {
-            --wb-border: rgba(255, 255, 255, 0.10);
+            --wb-border: rgba(255, 255, 255, 0.12);
             --wb-shadow: 0 16px 34px rgba(0, 0, 0, 0.34);
-            --wb-text-muted: rgba(255, 255, 255, 0.76);
 
-            /* 다크모드용 보이는 색 */
-            --wb-blue: rgba(59, 130, 246, 0.22);
-            --wb-indigo: rgba(99, 102, 241, 0.22);
-            --wb-purple: rgba(168, 85, 247, 0.20);
+            --wb-blue: rgba(59, 130, 246, 0.20);
             --wb-cyan: rgba(34, 211, 238, 0.18);
-            --wb-rose: rgba(244, 63, 94, 0.18);
-            --wb-amber: rgba(245, 158, 11, 0.20);
+            --wb-purple: rgba(168, 85, 247, 0.18);
+            --wb-amber: rgba(245, 158, 11, 0.18);
             --wb-green: rgba(34, 197, 94, 0.18);
+            --wb-rose: rgba(244, 63, 94, 0.18);
 
-            --wb-blue-border: rgba(96, 165, 250, 0.40);
-            --wb-purple-border: rgba(196, 181, 253, 0.38);
+            --wb-blue-border: rgba(96, 165, 250, 0.38);
             --wb-cyan-border: rgba(103, 232, 249, 0.34);
-            --wb-amber-border: rgba(252, 211, 77, 0.36);
-            --wb-green-border: rgba(134, 239, 172, 0.34);
-            --wb-rose-border: rgba(253, 164, 175, 0.34);
+            --wb-purple-border: rgba(196, 181, 253, 0.34);
+            --wb-amber-border: rgba(252, 211, 77, 0.32);
+            --wb-green-border: rgba(134, 239, 172, 0.32);
+            --wb-rose-border: rgba(253, 164, 175, 0.32);
         }
     }
 
@@ -66,16 +58,14 @@ def render_streamlit_base_style() -> None:
     [data-testid="stMain"],
     .stApp {
         background: var(--background-color);
-        color: var(--text-color);
     }
 
     section[data-testid="stSidebar"] {
-        background: var(--secondary-background-color);
+        background:
+            radial-gradient(circle at top left, var(--wb-purple) 0, transparent 25%),
+            radial-gradient(circle at bottom right, var(--wb-cyan) 0, transparent 22%),
+            var(--secondary-background-color);
         border-right: 1px solid var(--wb-border);
-    }
-
-    section[data-testid="stSidebar"] * {
-        color: var(--text-color);
     }
 
     .block-container {
@@ -86,21 +76,30 @@ def render_streamlit_base_style() -> None:
         padding-right: .75rem;
     }
 
+    .wb-brand {
+        font-size: 1.58rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin-bottom: .2rem;
+    }
+
     .hero-card,
     .wb-panel,
     .wb-module-card,
     .wb-brief-card,
     .wb-stat-card,
-    .wb-operator-box {
+    .wb-operator-box,
+    .card-soft {
+        border: 1px solid var(--wb-border);
         border-radius: 22px;
         box-shadow: var(--wb-shadow);
-        border: 1px solid var(--wb-border);
         overflow: hidden;
+        background: var(--secondary-background-color);
     }
 
     .hero-card {
-        padding: 1.45rem 1.6rem;
-        margin-bottom: 1.05rem;
+        padding: 1.35rem 1.5rem;
+        margin-bottom: 1rem;
         background:
             radial-gradient(circle at top right, var(--wb-cyan) 0, transparent 28%),
             radial-gradient(circle at left bottom, var(--wb-purple) 0, transparent 28%),
@@ -113,16 +112,25 @@ def render_streamlit_base_style() -> None:
     .wb-stat-card,
     .wb-operator-box {
         padding: 1rem 1.05rem;
-        background: var(--secondary-background-color);
+    }
+
+    .card-soft {
+        max-width: 560px;
+        margin: 0 auto 1rem auto;
+        padding: 1.1rem;
+        background:
+            radial-gradient(circle at top right, var(--wb-blue) 0, transparent 28%),
+            radial-gradient(circle at left bottom, var(--wb-purple) 0, transparent 26%),
+            var(--secondary-background-color);
     }
 
     .page-eyebrow {
-        color: var(--primary-color);
         font-size: .84rem;
         font-weight: 700;
         letter-spacing: .08em;
         text-transform: uppercase;
         margin-bottom: .45rem;
+        opacity: .9;
     }
 
     .page-title {
@@ -130,20 +138,18 @@ def render_streamlit_base_style() -> None:
         line-height: 1.08;
         font-weight: 700;
         margin: 0 0 .35rem 0;
-        color: var(--text-color);
     }
 
     .page-subtitle {
-        color: var(--wb-text-muted);
         font-size: 1rem;
         margin: 0;
+        opacity: .82;
     }
 
     .section-title {
         font-size: 1rem;
         font-weight: 700;
         margin-bottom: .8rem;
-        color: var(--text-color);
     }
 
     .wb-hero-chip-wrap {
@@ -154,12 +160,11 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-hero-chip {
-        background: var(--wb-indigo);
+        background: linear-gradient(135deg, var(--wb-blue), var(--wb-purple));
         border: 1px solid var(--wb-blue-border);
-        color: var(--text-color);
         border-radius: 999px;
-        padding: .52rem .86rem;
-        font-size: .88rem;
+        padding: .5rem .8rem;
+        font-size: .9rem;
         font-weight: 600;
     }
 
@@ -171,36 +176,37 @@ def render_streamlit_base_style() -> None:
         gap: .22rem;
     }
 
-    /* 카드 4개 각각 눈에 보이게 색 */
-    .wb-stat-card:nth-of-type(1) {
-        background: linear-gradient(135deg, var(--wb-blue), var(--secondary-background-color) 72%);
-        border-color: var(--wb-blue-border);
-    }
-    .wb-stat-card:nth-of-type(2) {
-        background: linear-gradient(135deg, var(--wb-cyan), var(--secondary-background-color) 72%);
-        border-color: var(--wb-cyan-border);
-    }
-    .wb-stat-card:nth-of-type(3) {
-        background: linear-gradient(135deg, var(--wb-amber), var(--secondary-background-color) 72%);
-        border-color: var(--wb-amber-border);
-    }
-    .wb-stat-card:nth-of-type(4) {
-        background: linear-gradient(135deg, var(--wb-purple), var(--secondary-background-color) 72%);
-        border-color: var(--wb-purple-border);
-    }
-
     .wb-stat-label {
         font-size: .92rem;
         font-weight: 600;
-        color: var(--wb-text-muted);
         margin-bottom: .18rem;
+        opacity: .82;
     }
 
     .wb-stat-value {
         font-size: 1.55rem;
         line-height: 1.1;
         font-weight: 700;
-        color: var(--text-color);
+    }
+
+    .wb-stat-card:nth-of-type(1) {
+        background: linear-gradient(135deg, var(--wb-blue), var(--secondary-background-color) 72%);
+        border-color: var(--wb-blue-border);
+    }
+
+    .wb-stat-card:nth-of-type(2) {
+        background: linear-gradient(135deg, var(--wb-cyan), var(--secondary-background-color) 72%);
+        border-color: var(--wb-cyan-border);
+    }
+
+    .wb-stat-card:nth-of-type(3) {
+        background: linear-gradient(135deg, var(--wb-amber), var(--secondary-background-color) 72%);
+        border-color: var(--wb-amber-border);
+    }
+
+    .wb-stat-card:nth-of-type(4) {
+        background: linear-gradient(135deg, var(--wb-purple), var(--secondary-background-color) 72%);
+        border-color: var(--wb-purple-border);
     }
 
     .wb-module-card {
@@ -237,24 +243,46 @@ def render_streamlit_base_style() -> None:
         justify-content: center;
         font-size: 1.35rem;
         flex-shrink: 0;
-        background: rgba(255,255,255,0.45);
+        background: rgba(255, 255, 255, 0.28);
+        border: 1px solid var(--wb-border);
         backdrop-filter: blur(8px);
     }
 
     @media (prefers-color-scheme: dark) {
         .wb-module-icon {
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
         }
     }
 
     .wb-module-list {
         margin: 0;
         padding-left: 1.2rem;
-        color: var(--text-color);
     }
 
     .wb-module-list li {
         margin-bottom: .35rem;
+    }
+
+    .wb-page-link-wrap {
+        margin-top: .55rem;
+    }
+
+    .wb-page-link-wrap [data-testid="stPageLink"] a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 44px;
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid var(--wb-border);
+        background: linear-gradient(135deg, var(--wb-blue), var(--wb-purple));
+        text-decoration: none;
+        box-shadow: none;
+    }
+
+    .wb-page-link-wrap [data-testid="stPageLink"] a:hover {
+        border-color: var(--wb-blue-border);
+        background: linear-gradient(135deg, var(--wb-cyan), var(--wb-blue));
     }
 
     .wb-brief-card {
@@ -265,10 +293,12 @@ def render_streamlit_base_style() -> None:
         background: linear-gradient(135deg, var(--wb-green), var(--secondary-background-color) 72%);
         border-color: var(--wb-green-border);
     }
+
     .wb-brief-card:nth-of-type(2) {
         background: linear-gradient(135deg, var(--wb-purple), var(--secondary-background-color) 72%);
         border-color: var(--wb-purple-border);
     }
+
     .wb-brief-card:nth-of-type(3) {
         background: linear-gradient(135deg, var(--wb-cyan), var(--secondary-background-color) 72%);
         border-color: var(--wb-cyan-border);
@@ -277,21 +307,20 @@ def render_streamlit_base_style() -> None:
     .wb-brief-label {
         font-size: .9rem;
         font-weight: 600;
-        color: var(--wb-text-muted);
         margin-bottom: .4rem;
+        opacity: .82;
     }
 
     .wb-brief-value {
         font-size: 1.9rem;
         font-weight: 700;
         line-height: 1;
-        color: var(--text-color);
         margin-bottom: .48rem;
     }
 
     .wb-brief-desc {
         font-size: .95rem;
-        color: var(--wb-text-muted);
+        opacity: .82;
     }
 
     .wb-operator-top {
@@ -303,7 +332,7 @@ def render_streamlit_base_style() -> None:
     }
 
     .wb-operator-badge {
-        background: var(--wb-indigo);
+        background: linear-gradient(135deg, var(--wb-blue), var(--wb-purple));
         border: 1px solid var(--wb-blue-border);
         border-radius: 999px;
         padding: .45rem .8rem;
@@ -325,7 +354,7 @@ def render_streamlit_base_style() -> None:
     .wb-operator-meta {
         font-size: 1rem;
         margin-bottom: .9rem;
-        color: var(--wb-text-muted);
+        opacity: .82;
     }
 
     .wb-operator-grid {
@@ -345,12 +374,11 @@ def render_streamlit_base_style() -> None:
         display: block;
         font-size: .84rem;
         margin-bottom: .3rem;
-        color: var(--wb-text-muted);
+        opacity: .8;
     }
 
     .wb-operator-chip strong {
         font-size: 1.02rem;
-        color: var(--text-color);
         font-weight: 700;
     }
 
@@ -363,16 +391,14 @@ def render_streamlit_base_style() -> None:
         white-space: nowrap;
         border-radius: 14px !important;
         border: 1px solid var(--wb-border) !important;
-        background: linear-gradient(135deg, var(--wb-indigo), var(--secondary-background-color)) !important;
-        color: var(--text-color) !important;
+        background: linear-gradient(135deg, var(--wb-blue), var(--wb-purple)) !important;
         box-shadow: none !important;
     }
 
     .stButton > button:hover,
     .stFormSubmitButton > button:hover {
         border-color: var(--wb-blue-border) !important;
-        background: linear-gradient(135deg, var(--wb-blue), var(--wb-cyan)) !important;
-        color: var(--text-color) !important;
+        background: linear-gradient(135deg, var(--wb-cyan), var(--wb-blue)) !important;
     }
 
     section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a {
@@ -380,7 +406,7 @@ def render_streamlit_base_style() -> None:
     }
 
     section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover {
-        background: linear-gradient(90deg, var(--wb-indigo), transparent);
+        background: linear-gradient(90deg, var(--wb-purple), transparent);
     }
 
     section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] {
@@ -394,7 +420,6 @@ def render_streamlit_base_style() -> None:
     .stSelectbox [data-baseweb="select"] > div,
     .stMultiSelect [data-baseweb="select"] > div {
         background: var(--secondary-background-color) !important;
-        color: var(--text-color) !important;
         border: 1px solid var(--wb-border) !important;
         border-radius: 14px !important;
         box-shadow: none !important;
