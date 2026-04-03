@@ -13,21 +13,6 @@ ACTUAL_CSV_PATH = DATA_DIR / "heatmap_actual.csv"
 ALL_MONTHS = list(range(1, 13))
 
 
-def _read_csv_with_fallback(path: Path, **kwargs) -> pd.DataFrame:
-    last_error = None
-    for enc in ("utf-8", "utf-8-sig", "cp949"):
-        try:
-            return pd.read_csv(path, encoding=enc, **kwargs)
-        except UnicodeDecodeError as e:
-            last_error = e
-            continue
-        except TypeError:
-            return pd.read_csv(path, **kwargs)
-    if last_error is not None:
-        raise last_error
-    return pd.read_csv(path, **kwargs)
-
-
 def _score_from_wct(wct: float) -> float:
     if pd.isna(wct):
         return np.nan
@@ -54,9 +39,12 @@ def _find_actual_csv() -> Path | None:
         if "forecast" in lower or "special_report" in lower:
             continue
         try:
-            head = _read_csv_with_fallback(p, nrows=3)
+            head = pd.read_csv(p, encoding="cp949", nrows=3)
         except Exception:
-            continue
+            try:
+                head = pd.read_csv(p, nrows=3)
+            except Exception:
+                continue
         cols = {str(c).strip().lower() for c in head.columns}
         if {"year", "month", "day", "hour", "sploc", "wct"}.issubset(cols) or {"year", "month", "hour", "sploc", "wct"}.issubset(cols):
             return p
@@ -68,7 +56,10 @@ def _load_actual_raw_cached() -> pd.DataFrame:
     path = _find_actual_csv()
     if path is None:
         raise FileNotFoundError("heatmap actual csv not found")
-    df = _read_csv_with_fallback(path)
+    try:
+        df = pd.read_csv(path, encoding="cp949")
+    except Exception:
+        df = pd.read_csv(path)
 
     df.columns = [str(c).strip().lower() for c in df.columns]
     if "wct" not in df.columns and "WCT" in df.columns:

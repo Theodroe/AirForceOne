@@ -14,27 +14,6 @@ from utils.realtime.utils import (
     ALERT_TRAINING_TYPES, MARITIME_KEYWORDS,
     apply_alert_to_status,
 )
-def _slice_region_date(df: pd.DataFrame, region: str, date: str | None) -> pd.DataFrame:
-    if not date:
-        return pd.DataFrame()
-    return df[(df["지역"] == region) & (df["날짜"] == date)].copy()
-
-
-def _time_value_map(rdf: pd.DataFrame, target_col: str) -> dict[str, float]:
-    if rdf.empty or target_col not in rdf.columns:
-        return {}
-    sub = rdf[["시간", target_col]].dropna(subset=[target_col]).copy()
-    sub["시간"] = sub["시간"].astype(str).str.zfill(2)
-    return dict(zip(sub["시간"], sub[target_col]))
-
-
-def _time_metric_map(rdf: pd.DataFrame, metric: str) -> dict[str, float]:
-    if rdf.empty or metric not in rdf.columns:
-        return {}
-    sub = rdf[["시간", metric]].dropna(subset=[metric]).copy()
-    sub["시간"] = sub["시간"].astype(str).str.zfill(2)
-    return dict(zip(sub["시간"], sub[metric]))
-
 
 # ── 지역 목록 (AREA_INFO 삽입 순서 = 표시 순서) ────────────────────────────────
 REGIONS: list[str] = list(AREA_INFO.keys())
@@ -99,27 +78,33 @@ def build_area_df(
     """
     alert_map = alert_map or {}
     rows = []
-
     for region in REGIONS:
-        al, at = alert_map.get(region, (None, None))
-        row = {"지역": region}
-
-        rdf_cur = _slice_region_date(df, region, date)
-        rdf_next = _slice_region_date(df, region, next_date)
-
-        cur_map = _time_value_map(rdf_cur, target_col)
-        next_map = _time_value_map(rdf_next, target_col)
-
+        al, at   = alert_map.get(region, (None, None))
+        row      = {"지역": region}
+        rdf_cur  = df[(df["지역"] == region) & (df["날짜"] == date)]
+        rdf_next = (
+            df[(df["지역"] == region) & (df["날짜"] == next_date)]
+            if next_date else pd.DataFrame()
+        )
         for hr in DUTY_CUR:
+            sub      = rdf_cur[rdf_cur["시간"] == hr]
             col_name = f"{int(hr):02d}시"
-            val = cur_map.get(hr)
-            row[col_name] = cell(val, month, al, at) if val is not None else "-"
-
+            row[col_name] = (
+                cell(sub.iloc[0][target_col], month, al, at)
+                if not sub.empty and pd.notna(sub.iloc[0][target_col])
+                else "-"
+            )
         for hr in DUTY_NEXT:
             col_name = f"익일 {int(hr):02d}시"
-            val = next_map.get(hr)
-            row[col_name] = cell(val, month, al, at) if val is not None else "-"
-
+            if rdf_next.empty:
+                row[col_name] = "-"
+            else:
+                sub = rdf_next[rdf_next["시간"] == hr]
+                row[col_name] = (
+                    cell(sub.iloc[0][target_col], month, al, at)
+                    if not sub.empty and pd.notna(sub.iloc[0][target_col])
+                    else "-"
+                )
         rows.append(row)
     return pd.DataFrame(rows).set_index("지역")
 
@@ -138,63 +123,63 @@ def build_summary_df(
     alert_level/alert_type: 오늘(i==0) 행에만 적용, 내일·모레는 온도 기준만 사용.
     """
     rows = []
-
     for i, date in enumerate(dates[:3]):
-        label = f"{DAY_LABELS[i]} ({date})"
-        row = {"날짜": label}
+        label     = f"{DAY_LABELS[i]} ({date})"
+        row       = {"날짜": label}
         next_date = dates[i + 1] if i + 1 < len(dates) else None
-
-        rdf_cur = _slice_region_date(df, region, date)
-        rdf_next = _slice_region_date(df, region, next_date)
-
-        cur_map = _time_value_map(rdf_cur, target_col)
-        next_map = _time_value_map(rdf_next, target_col)
-
+        rdf_cur   = df[(df["지역"] == region) & (df["날짜"] == date)]
+        rdf_next  = (
+            df[(df["지역"] == region) & (df["날짜"] == next_date)]
+            if next_date else pd.DataFrame()
+        )
         al = alert_level if i == 0 else None
-        at = alert_type if i == 0 else None
-
+        at = alert_type  if i == 0 else None
         for hr in DUTY_CUR:
+            sub      = rdf_cur[rdf_cur["시간"] == hr]
             col_name = f"{int(hr):02d}시"
-            val = cur_map.get(hr)
-            row[col_name] = cell(val, month, al, at) if val is not None else "-"
-
+            row[col_name] = (
+                cell(sub.iloc[0][target_col], month, al, at)
+                if not sub.empty and pd.notna(sub.iloc[0][target_col])
+                else "-"
+            )
         for hr in DUTY_NEXT:
             col_name = f"익일 {int(hr):02d}시"
-            val = next_map.get(hr)
-            row[col_name] = cell(val, month, al, at) if val is not None else "-"
-
+            if rdf_next.empty:
+                row[col_name] = "-"
+            else:
+                sub = rdf_next[rdf_next["시간"] == hr]
+                row[col_name] = (
+                    cell(sub.iloc[0][target_col], month, al, at)
+                    if not sub.empty and pd.notna(sub.iloc[0][target_col])
+                    else "-"
+                )
         rows.append(row)
-
     return pd.DataFrame(rows).set_index("날짜")
 
 
 def build_detail_df(df: pd.DataFrame, region: str, date: str) -> pd.DataFrame:
     """상세 기상 현황 (6개 지표 × 전시간대) DataFrame."""
     metrics = [
-        ("기온", "℃"),
-        ("풍속", "m/s"),
-        ("습도", "%"),
-        ("강수량", "mm"),
+        ("기온",     "℃"),
+        ("풍속",     "m/s"),
+        ("습도",     "%"),
+        ("강수량",   "mm"),
         ("체감온도", "℃"),
         ("온도지수", "℃"),
     ]
-
-    rdf = _slice_region_date(df, region, date)
+    rdf  = df[(df["지역"] == region) & (df["날짜"] == date)]
     rows = []
-
-    metric_maps = {metric: _time_metric_map(rdf, metric) for metric, _ in metrics}
-
     for metric, unit in metrics:
         row = {"항목": f"{metric}({unit})"}
-        value_map = metric_maps[metric]
-
         for hr in ALL_HOURS:
+            sub      = rdf[rdf["시간"] == hr]
             col_name = f"{int(hr):02d}시"
-            val = value_map.get(hr)
-            row[col_name] = f"{val:.1f}" if val is not None else "-"
-
+            if sub.empty or metric not in sub.columns:
+                row[col_name] = "-"
+            else:
+                val           = sub.iloc[0][metric]
+                row[col_name] = f"{val:.1f}" if pd.notna(val) else "-"
         rows.append(row)
-
     return pd.DataFrame(rows).set_index("항목")
 
 
@@ -306,8 +291,10 @@ def build_impact_df(active_df: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-# 특보 수집·저장 ══════════════════════════════════════════════════════════════════════════════
-@st.cache_data(ttl=600, show_spinner=False)
+# ══════════════════════════════════════════════════════════════════════════════
+# 특보 수집·저장
+# ══════════════════════════════════════════════════════════════════════════════
+
 def load_special_report() -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     """특보 수집·전처리 → (enriched_df, active_df, stats)."""
     empty = pd.DataFrame()
@@ -316,12 +303,12 @@ def load_special_report() -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     try:
         auth_key = get_auth_key()
         zones_df = fetch_alert_zones(auth_key)
-        raw_df = fetch_alert_data(auth_key)
+        raw_df   = fetch_alert_data(auth_key)
         if raw_df.empty:
             return empty, empty, {}
         enriched = enrich_alerts(raw_df, zones_df)
-        active = filter_active(enriched)
-        stats = get_stats(enriched)
+        active   = filter_active(enriched)
+        stats    = get_stats(enriched)
         return enriched, active, stats
     except Exception as e:
         st.warning(f"⚠️ 특보 데이터 수집 오류: {e}")

@@ -45,10 +45,7 @@ def _operator_box(authenticated: bool, user: dict | None) -> None:
 
 
 def _render_primary_menu() -> None:
-    st.markdown(
-        '<div class="section-title" style="margin:.25rem 0 .55rem 0;">메뉴</div>',
-        unsafe_allow_html=True,
-    )
+    st.markdown('<div class="section-title" style="margin:.25rem 0 .55rem 0;">메뉴</div>', unsafe_allow_html=True)
     for label, target, icon in TOP_MENU:
         st.page_link(target, label=label, icon=icon)
 
@@ -60,16 +57,8 @@ def _render_account_dropdown(authenticated: bool) -> None:
     else:
         options += ["로그인하기", "가입하기"]
 
-    st.markdown(
-        '<div class="section-title" style="margin: .95rem 0 .45rem 0;">계정 메뉴</div>',
-        unsafe_allow_html=True,
-    )
-    choice = st.selectbox(
-        "계정 메뉴",
-        options,
-        label_visibility="collapsed",
-        key="sidebar_account_menu",
-    )
+    st.markdown('<div class="section-title" style="margin: .95rem 0 .45rem 0;">계정 메뉴</div>', unsafe_allow_html=True)
+    choice = st.selectbox("계정 메뉴", options, label_visibility="collapsed", key="sidebar_account_menu")
     if st.button("이동", key="sidebar_account_go", use_container_width=True):
         if choice == "로그인하기":
             st.switch_page("app.py")
@@ -84,29 +73,21 @@ def _render_account_dropdown(authenticated: bool) -> None:
 
 def render_sidebar_ui(current_menu: str | None = None):
     user = get_current_user()
-
-    # ✅ 세션키 안전 처리 (둘 다 대응)
-    authenticated = bool(
-        st.session_state.get("authenticated")
-        or st.session_state.get("is_authenticated")
-    )
+    authenticated = bool(st.session_state.get("authenticated") or st.session_state.get("is_authenticated"))
 
     with st.sidebar:
         st.markdown('<div class="wb-brand">🌤️ W-BOSS</div>', unsafe_allow_html=True)
         st.caption("기상 기반 훈련 지원")
         st.markdown("---")
 
-        # ✅ 로그인 시에만 메뉴 표시
         if authenticated:
             _render_primary_menu()
             st.markdown("---")
 
-        # 항상 표시
         _operator_box(authenticated, user)
         st.markdown("---")
         _render_account_dropdown(authenticated)
-
-    return None
+        return None
 
 
 def route_guest_menu(menu: str | None):

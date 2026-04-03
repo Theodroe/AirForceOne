@@ -32,11 +32,12 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import streamlit as st
-from functools import lru_cache
+
 from services import init_session
 from ui import render_sidebar_ui, render_streamlit_base_style
 import pandas as pd
 from datetime import datetime, timedelta
+from utils.time_utils import now_kst, fmt_hms
 from streamlit_folium import st_folium
 
 # ── 단기예보 ──────────────────────────────────────────────────────────────────
@@ -100,28 +101,7 @@ if weather_df is None or weather_df.empty:
             st.warning(err)
     st.stop()
 
-weather_df = weather_df.copy()
-weather_df["시간"] = weather_df["시간"].astype(str).str.zfill(2)
-weather_df = weather_df.sort_values(["지역", "날짜", "시간"]).reset_index(drop=True)
-
-weather_lookup = {
-    (r["지역"], r["날짜"], r["시간"]): r.to_dict()
-    for _, r in weather_df.iterrows()
-}
-
-region_date_lookup = {
-    (region, date): sdf.copy()
-    for (region, date), sdf in weather_df.groupby(["지역", "날짜"], sort=False)
-}
-
-@lru_cache(maxsize=256)
-def get_region_date_df(region: str, date: str) -> pd.DataFrame:
-    return region_date_lookup.get((region, date), pd.DataFrame()).copy()
-
-def get_row(region: str, date: str, hour: str):
-    return weather_lookup.get((region, date, hour))
-
-now        = datetime.now()
+now        = now_kst()
 dates      = sorted(weather_df["날짜"].unique().tolist())
 month      = int(dates[0].split("/")[0]) if dates else now.month
 is_summer  = month in SUMMER_MONTHS
@@ -154,11 +134,10 @@ alert_stats = {}
 if SPECIAL_AVAILABLE:
     with st.spinner("📡 특보 데이터 수집 중..."):
         enriched_df, active_df, alert_stats = load_special_report()
-
-    special_saved_key = f"special_saved_for_{datetime.now().strftime('%Y%m%d%H')}"
-    if not enriched_df.empty and not st.session_state.get(special_saved_key, False):
+    if not enriched_df.empty:
         save_special_report(enriched_df)
-        st.session_state[special_saved_key] = True
+else:
+    st.sidebar.warning(f"특보 모듈 로드 실패: {SPECIAL_ERROR}")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 3. 헤더 — 타이틀 + 지역 선택 + 현재 시각
@@ -188,9 +167,8 @@ with region_col:
 
 @st.fragment(run_every=1)
 def live_clock():
-    _now = datetime.now()
-    st.caption("현재 시각")
-    st.write(f"#### {_now.strftime('%H:%M:%S')}")
+        st.caption("현재 시각")
+    st.write(f"#### {fmt_hms()}")
 
 
 with clock_col:
@@ -218,10 +196,10 @@ date_tab_labels = [
 # 4. 공용 데이터 준비
 # ══════════════════════════════════════════════════════════════════════════════
 
-rdf_today = get_region_date_df(region, dates[0])
+rdf_today = weather_df[(weather_df["지역"] == region) & (weather_df["날짜"] == dates[0])]
 avail_hrs = rdf_today["시간"].tolist()
-cur_hr = use_hr if use_hr in avail_hrs else (avail_hrs[0] if avail_hrs else "06")
-cur_row_obj = get_row(region, dates[0], cur_hr)
+cur_hr    = use_hr if use_hr in avail_hrs else (avail_hrs[0] if avail_hrs else "06")
+cur_row   = rdf_today[rdf_today["시간"] == cur_hr]
 
 region_active_df = (
     filter_timeline_by_region(active_df, region)
@@ -239,32 +217,28 @@ sel_alert_level, sel_alert_type = alert_map.get(region, (None, None))
 map_rows = []
 for r_name in REGIONS:
     lat, lng = REGION_COORDS[r_name]
-    row0 = get_row(r_name, dates[0], cur_hr)
+    sub = weather_df[
+        (weather_df["지역"] == r_name) &
+        (weather_df["날짜"] == dates[0]) &
+        (weather_df["시간"] == cur_hr)
+    ]
     al, at = alert_map.get(r_name, (None, None))
-
-    if row0 is None or pd.isna(row0.get(target_col)):
+    if sub.empty or target_col not in sub.columns or not pd.notna(sub.iloc[0][target_col]):
         base_status, val = "데이터없음", None
         tmp_v = wsd_v = pcp_v = reh_v = None
     else:
-        val = float(row0[target_col])
+        row0        = sub.iloc[0]
+        val         = float(row0[target_col])
         base_status, _ = get_status(val, month)
-        tmp_v = float(row0["기온"]) if pd.notna(row0.get("기온")) else None
-        wsd_v = float(row0["풍속"]) if pd.notna(row0.get("풍속")) else None
+        tmp_v = float(row0["기온"])   if pd.notna(row0.get("기온"))   else None
+        wsd_v = float(row0["풍속"])   if pd.notna(row0.get("풍속"))   else None
         pcp_v = float(row0["강수량"]) if pd.notna(row0.get("강수량")) else None
-        reh_v = float(row0["습도"]) if pd.notna(row0.get("습도")) else None
-
+        reh_v = float(row0["습도"])   if pd.notna(row0.get("습도"))   else None
     map_rows.append({
-        "지역": r_name,
-        "lat": lat,
-        "lng": lng,
-        "status": apply_alert_to_status(base_status, al) if base_status != "데이터없음" else "데이터없음",
-        "value": val,
-        "기온": tmp_v,
-        "풍속": wsd_v,
-        "강수량": pcp_v,
-        "습도": reh_v,
+        "지역": r_name, "lat": lat, "lng": lng,
+        "status": apply_alert_to_status(base_status, al), "value": val,
+        "기온": tmp_v, "풍속": wsd_v, "강수량": pcp_v, "습도": reh_v,
     })
-
 map_df = pd.DataFrame(map_rows)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -295,8 +269,8 @@ with col_live_top:
     with st.container(border=True):
         st.subheader(f"실시간 기상 영향 — {region}")
 
-        if cur_row_obj is not None:
-            r_row = cur_row_obj
+        if not cur_row.empty:
+            r_row = cur_row.iloc[0]
             m1, m2, m3, m4, m5 = st.columns(5)
             m1.metric("기온",    f"{r_row['기온']:.1f} ℃")
             m2.metric("체감온도", f"{r_row['체감온도']:.1f} ℃")

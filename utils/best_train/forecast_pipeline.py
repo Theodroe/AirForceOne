@@ -232,56 +232,46 @@ def _get_mysql_engine():
 
 def save_to_db(df: pd.DataFrame) -> None:
     """
-    forecast_data 테이블에 bulk insert 한다.
-    UNIQUE KEY(region, forecast_base_time, forecast_target_time) 중복 시 update.
+    forecast_data 테이블에 저장한다.
+    (region, forecast_base_time, forecast_target_time) 복합 키 중복 시 INSERT 스킵.
     """
     if df.empty:
         return
 
-    engine = _get_mysql_engine()
+    engine   = _get_mysql_engine()
+    inserted = 0
 
-    payload = df.rename(columns={
-        "지역": "region",
-        "기온": "tmp",
-        "풍속": "wsd",
-        "습도": "reh",
-        "강수량": "pcp",
-        "체감온도": "apparent_temp",
-        "온도지수": "heat_index",
-    })[
-        [
-            "region",
-            "forecast_base_time",
-            "forecast_target_time",
-            "tmp",
-            "wsd",
-            "reh",
-            "pcp",
-            "apparent_temp",
-            "heat_index",
-        ]
-    ].to_dict(orient="records")
+    with engine.connect() as conn:
+        for _, row in df.iterrows():
+            result = conn.execute(text("""
+                INSERT INTO forecast_data
+                    (region, forecast_base_time, forecast_target_time,
+                     tmp, wsd, reh, pcp, apparent_temp, heat_index)
+                SELECT :region, :base_time, :target_time,
+                       :tmp, :wsd, :reh, :pcp, :apparent, :heat
+                FROM DUAL
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM forecast_data
+                    WHERE region               = :region
+                      AND forecast_base_time   = :base_time
+                      AND forecast_target_time = :target_time
+                )
+            """), {
+                "region":      row["지역"],
+                "base_time":   row["forecast_base_time"],
+                "target_time": row["forecast_target_time"],
+                "tmp":         row.get("기온"),
+                "wsd":         row.get("풍속"),
+                "reh":         row.get("습도"),
+                "pcp":         row.get("강수량"),
+                "apparent":    row.get("체감온도"),
+                "heat":        row.get("온도지수"),
+            })
+            inserted += result.rowcount
 
-    sql = text("""
-        INSERT INTO forecast_data
-            (region, forecast_base_time, forecast_target_time,
-             tmp, wsd, reh, pcp, apparent_temp, heat_index)
-        VALUES
-            (:region, :forecast_base_time, :forecast_target_time,
-             :tmp, :wsd, :reh, :pcp, :apparent_temp, :heat_index)
-        ON DUPLICATE KEY UPDATE
-            tmp = VALUES(tmp),
-            wsd = VALUES(wsd),
-            reh = VALUES(reh),
-            pcp = VALUES(pcp),
-            apparent_temp = VALUES(apparent_temp),
-            heat_index = VALUES(heat_index)
-    """)
+        conn.commit()
 
-    with engine.begin() as conn:
-        conn.execute(sql, payload)
-
-    print(f"  ✅ DB 저장 완료: {len(payload)}행 upsert")
+    print(f"  ✅ DB 저장 완료: {inserted}행 insert")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -313,12 +303,10 @@ def run_collection_pipeline(
     -------
     { 'df': 전처리 완료 DataFrame, 'csv_path': 저장된 CSV 경로 }
     """
-    df = preprocess_forecast_df(weather_df, base_date, base_time)
+    df       = preprocess_forecast_df(weather_df, base_date, base_time)
     csv_path = save_to_dated_csv(df, target_dates, data_dir)
-
-    if not skip_db and not df.empty:
+    if not skip_db:
         save_to_db(df)
-
     return {"df": df, "csv_path": csv_path}
 
 

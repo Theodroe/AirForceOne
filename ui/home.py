@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+
 import pandas as pd
 import streamlit as st
 
@@ -8,21 +9,13 @@ from services import load_data
 from ui.summary_cards import render_summary_cards
 
 
-def _module_card(
-    title: str,
-    subtitle: str,
-    bullets: list[str],
-    button_label: str,
-    target: str,
-    emoji: str,
-    tone: str,
-) -> None:
+def _module_card(title: str, subtitle: str, bullets: list[str], button_label: str, target: str, emoji: str, variant: str) -> None:
     bullet_html = "".join(f"<li>{html.escape(item)}</li>" for item in bullets)
     st.markdown(
         f"""
-        <div class="wb-module-card wb-module-card-strong">
+        <div class="wb-module-card wb-module-card-strong {variant}">
             <div class="wb-module-head">
-                <div class="wb-module-icon" style="background:{tone};">{emoji}</div>
+                <div class="wb-module-icon">{emoji}</div>
                 <div>
                     <div class="section-title" style="margin-bottom:.15rem;">{html.escape(title)}</div>
                     <div class="page-subtitle">{html.escape(subtitle)}</div>
@@ -84,7 +77,6 @@ def render_main_dashboard() -> None:
 
     st.markdown('<div class="section-title" style="margin-top:.95rem;">바로가기</div>', unsafe_allow_html=True)
     left, right = st.columns(2, gap="large")
-
     with left:
         _module_card(
             "실시간 현황 대시보드",
@@ -93,9 +85,8 @@ def render_main_dashboard() -> None:
             "실시간 현황 대시보드 열기",
             "pages/best_train_time.py",
             "🛡️",
-            "linear-gradient(135deg, #2563eb 0%, #38bdf8 100%)",
+            "wb-module-variant-primary",
         )
-
     with right:
         _module_card(
             "연간 훈련가용 판정 현황",
@@ -104,17 +95,14 @@ def render_main_dashboard() -> None:
             "연간 훈련가용 판정 현황 열기",
             "pages/heatmap.py",
             "🌡️",
-            "linear-gradient(135deg, #0f766e 0%, #22c55e 100%)",
+            "wb-module-variant-success",
         )
 
     st.markdown('<div class="section-title" style="margin-top:1rem;">운용 브리프</div>', unsafe_allow_html=True)
     b1, b2, b3 = st.columns(3, gap="large")
-
     with b1:
         _brief_card("실시간 운용", "기상 영향", "현재 지역 기준 기상 영향과 제한 시간대를 빠르게 확인")
-
     with b2:
         _brief_card("연간 분석", "가용 패턴", "365일 분포와 연속 가용 구간을 한 화면에서 분석")
-
     with b3:
         _brief_card("데이터 기준", "2020~2025", "기상 데이터 기준")
