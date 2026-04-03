@@ -70,7 +70,7 @@ def render_streamlit_base_style() -> None:
     .wb-stat-card,
     .wb-operator-box {
         background: var(--secondary-background-color);
-        border: 1.35px solid var(--wb-border);
+        border: 1.5px solid var(--wb-border);
         border-radius: 20px;
         box-shadow: var(--wb-shadow);
     }
@@ -139,8 +139,6 @@ def render_streamlit_base_style() -> None:
         flex-direction: column;
         justify-content: center;
         gap: .2rem;
-        color: var(--text-color) !important;
-        -webkit-text-fill-color: var(--text-color) !important;
     }
 
     .wb-stat-label {
