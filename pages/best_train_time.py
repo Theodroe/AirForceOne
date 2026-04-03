@@ -99,26 +99,27 @@ if weather_df is None or weather_df.empty:
         for err in st.session_state["api_errors"]:
             st.warning(err)
     st.stop()
-    weather_df = weather_df.copy()
-    weather_df["시간"] = weather_df["시간"].astype(str).str.zfill(2)
-    weather_df = weather_df.sort_values(["지역", "날짜", "시간"]).reset_index(drop=True)
 
-    weather_lookup = {
-        (r["지역"], r["날짜"], r["시간"]): r
-        for _, r in weather_df.iterrows()
-    }
+weather_df = weather_df.copy()
+weather_df["시간"] = weather_df["시간"].astype(str).str.zfill(2)
+weather_df = weather_df.sort_values(["지역", "날짜", "시간"]).reset_index(drop=True)
 
-    region_date_lookup = {
-        (region, date): sdf.copy()
-        for (region, date), sdf in weather_df.groupby(["지역", "날짜"], sort=False)
-    }
+weather_lookup = {
+    (r["지역"], r["날짜"], r["시간"]): r.to_dict()
+    for _, r in weather_df.iterrows()
+}
 
-    @lru_cache(maxsize=256)
-    def get_region_date_df(region: str, date: str) -> pd.DataFrame:
-        return region_date_lookup.get((region, date), pd.DataFrame()).copy()
+region_date_lookup = {
+    (region, date): sdf.copy()
+    for (region, date), sdf in weather_df.groupby(["지역", "날짜"], sort=False)
+}
 
-    def get_row(region: str, date: str, hour: str):
-        return weather_lookup.get((region, date, hour))
+@lru_cache(maxsize=256)
+def get_region_date_df(region: str, date: str) -> pd.DataFrame:
+    return region_date_lookup.get((region, date), pd.DataFrame()).copy()
+
+def get_row(region: str, date: str, hour: str):
+    return weather_lookup.get((region, date, hour))
 
 now        = datetime.now()
 dates      = sorted(weather_df["날짜"].unique().tolist())
@@ -238,28 +239,32 @@ sel_alert_level, sel_alert_type = alert_map.get(region, (None, None))
 map_rows = []
 for r_name in REGIONS:
     lat, lng = REGION_COORDS[r_name]
-    sub = weather_df[
-        (weather_df["지역"] == r_name) &
-        (weather_df["날짜"] == dates[0]) &
-        (weather_df["시간"] == cur_hr)
-    ]
+    row0 = get_row(r_name, dates[0], cur_hr)
     al, at = alert_map.get(r_name, (None, None))
-    if sub.empty or target_col not in sub.columns or not pd.notna(sub.iloc[0][target_col]):
+
+    if row0 is None or pd.isna(row0.get(target_col)):
         base_status, val = "데이터없음", None
         tmp_v = wsd_v = pcp_v = reh_v = None
     else:
-        row0        = sub.iloc[0]
-        val         = float(row0[target_col])
+        val = float(row0[target_col])
         base_status, _ = get_status(val, month)
-        tmp_v = float(row0["기온"])   if pd.notna(row0.get("기온"))   else None
-        wsd_v = float(row0["풍속"])   if pd.notna(row0.get("풍속"))   else None
+        tmp_v = float(row0["기온"]) if pd.notna(row0.get("기온")) else None
+        wsd_v = float(row0["풍속"]) if pd.notna(row0.get("풍속")) else None
         pcp_v = float(row0["강수량"]) if pd.notna(row0.get("강수량")) else None
-        reh_v = float(row0["습도"])   if pd.notna(row0.get("습도"))   else None
+        reh_v = float(row0["습도"]) if pd.notna(row0.get("습도")) else None
+
     map_rows.append({
-        "지역": r_name, "lat": lat, "lng": lng,
-        "status": apply_alert_to_status(base_status, al), "value": val,
-        "기온": tmp_v, "풍속": wsd_v, "강수량": pcp_v, "습도": reh_v,
+        "지역": r_name,
+        "lat": lat,
+        "lng": lng,
+        "status": apply_alert_to_status(base_status, al) if base_status != "데이터없음" else "데이터없음",
+        "value": val,
+        "기온": tmp_v,
+        "풍속": wsd_v,
+        "강수량": pcp_v,
+        "습도": reh_v,
     })
+
 map_df = pd.DataFrame(map_rows)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -290,8 +295,8 @@ with col_live_top:
     with st.container(border=True):
         st.subheader(f"실시간 기상 영향 — {region}")
 
-        if not cur_row.empty:
-            r_row = cur_row.iloc[0]
+        if cur_row_obj is not None:
+            r_row = cur_row_obj
             m1, m2, m3, m4, m5 = st.columns(5)
             m1.metric("기온",    f"{r_row['기온']:.1f} ℃")
             m2.metric("체감온도", f"{r_row['체감온도']:.1f} ℃")
