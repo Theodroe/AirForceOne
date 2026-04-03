@@ -493,6 +493,130 @@ def render_streamlit_base_style() -> None:
     }
 }
 
+/* mypage prettier refresh */
+.wb-mypage-hero {
+    background:
+        radial-gradient(circle at top right, var(--wb-cyan) 0, transparent 26%),
+        radial-gradient(circle at left bottom, var(--wb-purple) 0, transparent 24%),
+        linear-gradient(135deg, var(--wb-blue), var(--secondary-background-color) 72%);
+}
+
+.wb-section-head {
+    margin-bottom: .7rem;
+}
+
+.wb-section-subtitle {
+    font-size: .94rem;
+    opacity: .76;
+    margin-bottom: .15rem;
+}
+
+.wb-info-panel,
+.wb-action-panel {
+    padding: 1.1rem 1.15rem;
+}
+
+.wb-stack-panel {
+    display: block;
+}
+
+.wb-info-box {
+    border-radius: 18px;
+    border: 1px solid var(--wb-border);
+    padding: 1rem 1.05rem;
+    min-height: 128px;
+    margin-bottom: .8rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+.wb-info-box.blue {
+    background: linear-gradient(135deg, var(--wb-blue), var(--secondary-background-color) 74%);
+    border-color: var(--wb-blue-border);
+}
+
+.wb-info-box.purple {
+    background: linear-gradient(135deg, var(--wb-purple), var(--secondary-background-color) 74%);
+    border-color: var(--wb-purple-border);
+}
+
+.wb-info-box.cyan {
+    background: linear-gradient(135deg, var(--wb-cyan), var(--secondary-background-color) 74%);
+    border-color: var(--wb-cyan-border);
+}
+
+.wb-info-box.amber {
+    background: linear-gradient(135deg, var(--wb-amber), var(--secondary-background-color) 74%);
+    border-color: var(--wb-amber-border);
+}
+
+.wb-info-box.green {
+    background: linear-gradient(135deg, var(--wb-green), var(--secondary-background-color) 74%);
+    border-color: var(--wb-green-border);
+}
+
+.wb-info-summary {
+    background: linear-gradient(135deg, var(--wb-rose), var(--secondary-background-color) 74%);
+    border-color: var(--wb-rose-border);
+}
+
+.wb-info-kicker {
+    font-size: .84rem;
+    font-weight: 600;
+    opacity: .75;
+    margin-bottom: .5rem;
+    letter-spacing: .02em;
+}
+
+.wb-info-main {
+    font-size: 1.9rem;
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: .3rem;
+}
+
+.wb-info-note {
+    font-size: .92rem;
+    opacity: .78;
+    line-height: 1.4;
+}
+
+.wb-mini-head {
+    font-size: .95rem;
+    font-weight: 700;
+    margin-bottom: .65rem;
+}
+
+.wb-divider {
+    height: 1px;
+    margin: .9rem 0 1rem 0;
+    background: linear-gradient(90deg, transparent, var(--wb-border), transparent);
+}
+
+.wb-danger-note {
+    font-size: .9rem;
+    line-height: 1.45;
+    opacity: .8;
+    margin-bottom: .6rem;
+}
+
+.wb-action-panel [data-testid="stForm"] {
+    background: transparent;
+    border: 0;
+    padding: 0;
+}
+
+.wb-action-panel .stForm {
+    margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+    .wb-info-box {
+        min-height: auto;
+    }
+}
+
+
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
