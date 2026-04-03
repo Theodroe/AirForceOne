@@ -21,9 +21,9 @@ def render_streamlit_base_style() -> None:
         --wb-accent-border: color-mix(in srgb, var(--primary-color) 24%, transparent);
         --wb-card-highlight: linear-gradient(
             135deg,
-            color-mix(in srgb, var(--primary-color) 5%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 4%, var(--secondary-background-color)) 48%,
-            color-mix(in srgb, #06b6d4 3%, var(--secondary-background-color)) 100%
+            color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color)) 0%,
+            color-mix(in srgb, #7c3aed 7%, var(--secondary-background-color)) 48%,
+            color-mix(in srgb, #06b6d4 6%, var(--secondary-background-color)) 100%
         );
     }
 
@@ -41,9 +41,9 @@ def render_streamlit_base_style() -> None:
             --wb-accent-border: color-mix(in srgb, var(--primary-color) 28%, transparent);
             --wb-card-highlight: linear-gradient(
                 135deg,
-                color-mix(in srgb, var(--primary-color) 7%, var(--secondary-background-color)) 0%,
-                color-mix(in srgb, #a78bfa 5%, var(--secondary-background-color)) 48%,
-                color-mix(in srgb, #22d3ee 4%, var(--secondary-background-color)) 100%
+                color-mix(in srgb, var(--primary-color) 11%, var(--secondary-background-color)) 0%,
+                color-mix(in srgb, #a78bfa 8%, var(--secondary-background-color)) 48%,
+                color-mix(in srgb, #22d3ee 7%, var(--secondary-background-color)) 100%
             );
         }
     }
@@ -83,11 +83,11 @@ def render_streamlit_base_style() -> None:
     section[data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-current="page"] {
         background: linear-gradient(
             90deg,
-            color-mix(in srgb, var(--primary-color) 14%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 8%, var(--secondary-background-color)) 55%,
-            color-mix(in srgb, #06b6d4 6%, var(--secondary-background-color)) 100%
+            color-mix(in srgb, var(--primary-color) 20%, var(--secondary-background-color)) 0%,
+            color-mix(in srgb, #7c3aed 14%, var(--secondary-background-color)) 55%,
+            color-mix(in srgb, #06b6d4 10%, var(--secondary-background-color)) 100%
         );
-        border: 1px solid color-mix(in srgb, var(--primary-color) 18%, transparent);
+        border: 1px solid color-mix(in srgb, var(--primary-color) 22%, transparent);
     }
 
     .block-container {
@@ -136,9 +136,9 @@ def render_streamlit_base_style() -> None:
         overflow: hidden;
         background: linear-gradient(
             135deg,
-            color-mix(in srgb, var(--primary-color) 7%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 4%, var(--secondary-background-color)) 52%,
-            color-mix(in srgb, #06b6d4 3%, var(--secondary-background-color)) 100%
+            color-mix(in srgb, var(--primary-color) 10%, var(--secondary-background-color)) 0%,
+            color-mix(in srgb, #7c3aed 7%, var(--secondary-background-color)) 52%,
+            color-mix(in srgb, #06b6d4 6%, var(--secondary-background-color)) 100%
         );
     }
     .hero-card::after {
@@ -228,8 +228,8 @@ def render_streamlit_base_style() -> None:
         overflow: hidden;
         background: linear-gradient(
             135deg,
-            color-mix(in srgb, var(--primary-color) 6%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #06b6d4 3%, var(--secondary-background-color)) 100%
+            color-mix(in srgb, var(--primary-color) 11%, var(--secondary-background-color)) 0%,
+            color-mix(in srgb, #06b6d4 7%, var(--secondary-background-color)) 100%
         );
     }
     .wb-stat-card::before {
@@ -270,8 +270,8 @@ def render_streamlit_base_style() -> None:
         overflow: hidden;
         background: linear-gradient(
             135deg,
-            color-mix(in srgb, var(--primary-color) 5%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #7c3aed 4%, var(--secondary-background-color)) 100%
+            color-mix(in srgb, var(--primary-color) 9%, var(--secondary-background-color)) 0%,
+            color-mix(in srgb, #7c3aed 8%, var(--secondary-background-color)) 100%
         );
     }
 
@@ -353,8 +353,8 @@ def render_streamlit_base_style() -> None:
         overflow: hidden;
         background: linear-gradient(
             135deg,
-            color-mix(in srgb, #7c3aed 5%, var(--secondary-background-color)) 0%,
-            color-mix(in srgb, #06b6d4 3%, var(--secondary-background-color)) 100%
+            color-mix(in srgb, #7c3aed 10%, var(--secondary-background-color)) 0%,
+            color-mix(in srgb, #06b6d4 7%, var(--secondary-background-color)) 100%
         );
     }
     .wb-brief-card::before {
